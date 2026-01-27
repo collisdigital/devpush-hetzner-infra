@@ -8,29 +8,33 @@ This repository contains the Terraform configuration to bootstrap a foundational
 *   **Firewall**: Only ports 22 (SSH), 80 (HTTP), and 443 (HTTPS) are open.
 *   **DNS**: Managed by Cloudflare.
     *   `devpush.collis.digital` -> Server IP (Proxied)
-    *   `*.collis.digital` -> `devpush.collis.digital` (Proxied)
+    *   `*.collis.digital` -> `devpush.collis.digital` (Unproxied, managed by devpush)
     *   `direct.collis.digital` -> Server IP (Unproxied, for SSH)
 *   **State**: Terraform state is stored in Hetzner Object Storage (S3-compatible).
 
 ## Prerequisites
 
-1.  **Terraform** (>= 1.5.0) installed.
+1.  **Terraform** (>= 1.5.0) installed (for initial bootstrap).
 2.  **Hetzner Cloud Token** (Read/Write).
 3.  **Cloudflare API Token** (Edit DNS).
 4.  **Hetzner Object Storage Credentials** (Access Key & Secret Key).
 5.  **SSH Key** already added to Hetzner Cloud.
 
-## Initialization
+## Bootstrap (Initial Setup)
 
-Since we use Hetzner Object Storage for the backend, we face a "chicken-and-egg" problem: the bucket must exist before we can store the state in it.
+To get started, you must first create the S3 bucket and migrate the state.
 
-### Step 1: Create the Bucket
+### Step 1: Create the Bucket (Local)
 
-1.  Initialize Terraform locally (without the backend configuration):
+1.  **Important**: Rename `backend.tf` to `backend.tf.disabled` temporarily. This prevents Terraform from trying to connect to the non-existent bucket during initialization.
+    ```bash
+    mv backend.tf backend.tf.disabled
+    ```
+2.  Initialize Terraform locally:
     ```bash
     terraform init
     ```
-2.  Create a `terraform.tfvars` file (DO NOT COMMIT THIS FILE) with your secrets:
+3.  Create a `terraform.tfvars` file (DO NOT COMMIT):
     ```hcl
     hcloud_token         = "your-hcloud-token"
     cloudflare_api_token = "your-cf-token"
@@ -40,54 +44,55 @@ Since we use Hetzner Object Storage for the backend, we face a "chicken-and-egg"
     s3_secret_key        = "your-secret-key"
     s3_bucket_name       = "your-unique-bucket-name"
     ```
-3.  Apply the configuration to create the bucket (and other resources):
+4.  Apply just the bucket resources:
     ```bash
     terraform apply -target=aws_s3_bucket.terraform_state -target=aws_s3_bucket_versioning.terraform_state
     ```
-    *Note: You can run a full `terraform apply` here, but targeting the bucket first is safer if you plan to migrate state immediately.*
 
 ### Step 2: Configure the Backend
 
-1.  Create a file named `backend.tf` with the following content (replacing values matching your variables):
-
-    ```hcl
-    terraform {
-      backend "s3" {
-        bucket   = "your-unique-bucket-name"
-        key      = "devpush/terraform.tfstate"
-        region   = "nbg1" # or your s3_region
-        endpoint = "https://nbg1.your-objectstorage.com"
-
-        # S3-compatible configuration
-        skip_credentials_validation = true
-        skip_region_validation      = true
-        skip_requesting_account_id  = true
-        skip_metadata_api_check     = true
-        use_path_style              = true
-
-        # Credentials can be provided via environment variables or file
-        # AWS_ACCESS_KEY_ID=... AWS_SECRET_ACCESS_KEY=...
-      }
-    }
+1.  Restore the `backend.tf` file:
+    ```bash
+    mv backend.tf.disabled backend.tf
     ```
-
-2.  Re-initialize Terraform to migrate the local state to the bucket:
+2.  Edit `backend.tf`:
+    *   Replace `devpush-terraform-state` with your actual bucket name (the one you set in `terraform.tfvars`).
+    *   Ensure the `endpoint` matches your Object Storage region (default is `fsn1`).
+3.  Initialize the backend (migrating local state to S3):
     ```bash
     export AWS_ACCESS_KEY_ID="your-access-key"
     export AWS_SECRET_ACCESS_KEY="your-secret-key"
     terraform init -migrate-state
     ```
+4.  Commit and push the updated `backend.tf`.
 
-## Deployment
+## CI/CD with GitHub Actions
 
-1.  Run the full apply to provision the server and DNS:
-    ```bash
-    terraform apply
-    ```
+This repository is configured with GitHub Actions to automate Infrastructure changes.
 
-2.  The server will be provisioned with `cloud-init`. It creates a user `deploy` and installs `devpush`.
+### Required Secrets
 
-## Configuration & GitHub App
+Go to **Settings > Secrets and variables > Actions** in your GitHub repository and add the following repository secrets:
+
+*   `HCLOUD_TOKEN`: Your Hetzner Cloud API Token.
+*   `CLOUDFLARE_API_TOKEN`: Your Cloudflare API Token.
+*   `S3_ACCESS_KEY`: Access Key for Hetzner Object Storage.
+*   `S3_SECRET_KEY`: Secret Key for Hetzner Object Storage.
+*   `S3_BUCKET_NAME`: The name of the S3 bucket you created.
+*   `SSH_KEY_NAME`: The name of the SSH Key in Hetzner.
+
+### Configuration Variables (Optional)
+
+You can set these as **Variables** (not secrets):
+
+*   `DOMAIN_NAME`: e.g., `collis.digital` (Defaults to `collis.digital` if unset).
+
+### Workflow
+
+1.  **Pull Request**: Terraform initializes and runs `plan`. The plan output is posted as a comment on the PR.
+2.  **Push to Main**: Terraform runs `apply` automatically.
+
+## Post-Provisioning Configuration
 
 After the server is up:
 
@@ -113,12 +118,3 @@ After the server is up:
     ```bash
     sudo systemctl enable --now devpush
     ```
-
-## Adding a New Project
-
-1.  Go to your dashboard at `https://devpush.collis.digital`.
-2.  Click **New Project**.
-3.  Select your GitHub repository (e.g., `children-holiday-spending`).
-4.  DevPush will auto-detect the configuration (Dockerfile, etc.).
-5.  Deploy!
-    *   The project will be available at `children-holiday-spending.collis.digital` (thanks to the wildcard DNS).

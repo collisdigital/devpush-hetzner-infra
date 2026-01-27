@@ -25,4 +25,4 @@ write_files:
 
 runcmd:
   - systemctl restart ssh
-  - curl -fsSL https://install.devpu.sh | bash
+  - curl -fsSL https://get.devpu.sh | bash

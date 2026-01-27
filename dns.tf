@@ -17,7 +17,7 @@ resource "cloudflare_record" "wildcard" {
   name    = "*"
   value   = "devpush.${var.domain_name}"
   type    = "CNAME"
-  proxied = true
+  proxied = false
 }
 
 # Unproxied A record for SSH access (direct.collis.digital)
