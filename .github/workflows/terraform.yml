@@ -16,12 +16,24 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.0
+          terraform_version: 1.14.3
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v6
+        with:
+          tflint_version: v0.60.0
+
+      - name: Run TFLint
+        run: ./scripts/lint.sh
+
+      - name: Run Validation Script
+        id: validation
+        run: ./scripts/validate.sh
 
       - name: Terraform Init
         id: init
@@ -29,10 +41,6 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_KEY }}
         run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
 
       - name: Terraform Plan
         id: plan
@@ -58,7 +66,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.validation.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 

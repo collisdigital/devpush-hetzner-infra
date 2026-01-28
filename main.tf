@@ -3,11 +3,11 @@ data "hcloud_ssh_key" "main" {
 }
 
 resource "hcloud_server" "devpush" {
-  name        = "devpush"
-  image       = "ubuntu-24.04"
-  server_type = "cpx11"
-  location    = "nbg1"
-  ssh_keys    = [data.hcloud_ssh_key.main.id]
+  name         = "devpush"
+  image        = "ubuntu-24.04"
+  server_type  = "cpx11"
+  location     = "nbg1"
+  ssh_keys     = [data.hcloud_ssh_key.main.id]
   firewall_ids = [hcloud_firewall.devpush.id]
 
   user_data = templatefile("${path.module}/cloud-config.yaml", {
