@@ -26,7 +26,7 @@ resource "hcloud_server" "devpush" {
   })
 
   public_net {
-    ipv4_enabled = false
+    ipv4_enabled = true
     ipv6_enabled = true
   }
 }
