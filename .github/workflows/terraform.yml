@@ -39,16 +39,17 @@ jobs:
         with:
           tflint_version: v0.60.0
 
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
       - name: Run TFLint
+        id: tflint
         run: ./scripts/lint.sh
 
       - name: Run Validation Script
         id: validation
         run: ./scripts/validate.sh
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
 
       - name: Terraform Plan
         id: plan
@@ -57,7 +58,7 @@ jobs:
         continue-on-error: true
 
       - name: Update Pull Request
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         if: github.event_name == 'pull_request'
         env:
           PLAN: ${{ steps.plan.outputs.stdout }}
