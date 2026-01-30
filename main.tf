@@ -2,6 +2,22 @@ data "hcloud_ssh_key" "main" {
   name = var.ssh_key_name
 }
 
+resource "hcloud_primary_ip" "devpush_ipv4" {
+  name          = "devpush_ipv4"
+  type          = "ipv4"
+  assignee_type = "server"
+  auto_delete   = false
+  location      = "nbg1"
+}
+
+resource "hcloud_primary_ip" "devpush_ipv6" {
+  name          = "devpush_ipv6"
+  type          = "ipv6"
+  assignee_type = "server"
+  auto_delete   = false
+  location      = "nbg1"
+}
+
 resource "hcloud_server" "devpush" {
   name         = "devpush"
   image        = "ubuntu-24.04"
@@ -26,7 +42,7 @@ resource "hcloud_server" "devpush" {
   })
 
   public_net {
-    ipv4_enabled = true
-    ipv6_enabled = true
+    ipv4 = hcloud_primary_ip.devpush_ipv4.id
+    ipv6 = hcloud_primary_ip.devpush_ipv6.id
   }
 }

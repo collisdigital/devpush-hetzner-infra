@@ -1,5 +1,5 @@
 output "server_ip" {
-  value       = hcloud_server.devpush.ipv4_address
+  value       = hcloud_primary_ip.devpush_ipv4.ip_address
   description = "Public IP of the DevPush server"
 }
 

@@ -9,7 +9,7 @@ data "cloudflare_zone" "main" {
 resource "cloudflare_dns_record" "devpush_app" {
   zone_id = data.cloudflare_zone.main.id
   name    = "devpush"
-  content = hcloud_server.devpush.ipv6_address
+  content = hcloud_primary_ip.devpush_ipv6.ip_address
   type    = "AAAA"
   proxied = true
   ttl     = 1 # Automatic
@@ -18,7 +18,7 @@ resource "cloudflare_dns_record" "devpush_app" {
 resource "cloudflare_dns_record" "devpush_app_v4" {
   zone_id = data.cloudflare_zone.main.id
   name    = "devpush"
-  content = hcloud_server.devpush.ipv4_address
+  content = hcloud_primary_ip.devpush_ipv4.ip_address
   type    = "A"
   proxied = true
   ttl     = 1 # Automatic
@@ -39,7 +39,7 @@ resource "cloudflare_dns_record" "wildcard" {
 resource "cloudflare_dns_record" "direct" {
   zone_id = data.cloudflare_zone.main.id
   name    = "direct"
-  content = hcloud_server.devpush.ipv6_address
+  content = hcloud_primary_ip.devpush_ipv6.ip_address
   type    = "AAAA"
   proxied = false
   ttl     = 1 # Automatic
@@ -48,7 +48,7 @@ resource "cloudflare_dns_record" "direct" {
 resource "cloudflare_dns_record" "direct_v4" {
   zone_id = data.cloudflare_zone.main.id
   name    = "direct"
-  content = hcloud_server.devpush.ipv4_address
+  content = hcloud_primary_ip.devpush_ipv4.ip_address
   type    = "A"
   proxied = false
   ttl     = 1 # Automatic
