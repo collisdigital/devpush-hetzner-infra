@@ -14,7 +14,7 @@ This repository contains the Terraform configuration to bootstrap a foundational
 
 ## Prerequisites
 
-1.  **Terraform** (>= 1.5.0) installed (for initial bootstrap).
+1.  **Terraform** (>= 1.14.3) installed (for initial bootstrap).
 2.  **Hetzner Object Storage Credentials** (Access Key & Secret Key).
 3.  **Hetzner Cloud Token** (Read/Write).
 4.  **Cloudflare API Token** (Edit DNS).
