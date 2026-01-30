@@ -15,56 +15,10 @@ This repository contains the Terraform configuration to bootstrap a foundational
 ## Prerequisites
 
 1.  **Terraform** (>= 1.5.0) installed (for initial bootstrap).
+4.  **Hetzner Object Storage Credentials** (Access Key & Secret Key).
 2.  **Hetzner Cloud Token** (Read/Write).
 3.  **Cloudflare API Token** (Edit DNS).
-4.  **Hetzner Object Storage Credentials** (Access Key & Secret Key).
 5.  **SSH Key** already added to Hetzner Cloud.
-
-## Bootstrap (Initial Setup)
-
-To get started, you must first create the S3 bucket and migrate the state.
-
-### Step 1: Create the Bucket (Local)
-
-1.  **Important**: Rename `backend.tf` to `backend.tf.disabled` temporarily. This prevents Terraform from trying to connect to the non-existent bucket during initialization.
-    ```bash
-    mv backend.tf backend.tf.disabled
-    ```
-2.  Initialize Terraform locally:
-    ```bash
-    terraform init
-    ```
-3.  Create a `terraform.tfvars` file (DO NOT COMMIT):
-    ```hcl
-    hcloud_token         = "your-hcloud-token"
-    cloudflare_api_token = "your-cf-token"
-    ssh_key_name         = "your-ssh-key-name"
-    domain_name          = "collis.digital"
-    s3_access_key        = "your-access-key"
-    s3_secret_key        = "your-secret-key"
-    s3_bucket_name       = "your-unique-bucket-name"
-    ```
-4.  Apply just the bucket resources:
-    ```bash
-    terraform apply -target=aws_s3_bucket.terraform_state -target=aws_s3_bucket_versioning.terraform_state
-    ```
-
-### Step 2: Configure the Backend
-
-1.  Restore the `backend.tf` file:
-    ```bash
-    mv backend.tf.disabled backend.tf
-    ```
-2.  Edit `backend.tf`:
-    *   Replace `devpush-terraform-state` with your actual bucket name (the one you set in `terraform.tfvars`).
-    *   Ensure the `endpoint` matches your Object Storage region (default is `fsn1`).
-3.  Initialize the backend (migrating local state to S3):
-    ```bash
-    export AWS_ACCESS_KEY_ID="your-access-key"
-    export AWS_SECRET_ACCESS_KEY="your-secret-key"
-    terraform init -migrate-state
-    ```
-4.  Commit and push the updated `backend.tf`.
 
 ## CI/CD with GitHub Actions
 
@@ -74,11 +28,10 @@ This repository is configured with GitHub Actions to automate Infrastructure cha
 
 Go to **Settings > Secrets and variables > Actions** in your GitHub repository and add the following repository secrets:
 
+*   `AWS_S3_ACCESS_KEY`: Access Key for Hetzner Object Storage.
+*   `AWS_S3_SECRET_KEY`: Secret Key for Hetzner Object Storage.
 *   `HCLOUD_TOKEN`: Your Hetzner Cloud API Token.
 *   `CLOUDFLARE_API_TOKEN`: Your Cloudflare API Token.
-*   `S3_ACCESS_KEY`: Access Key for Hetzner Object Storage.
-*   `S3_SECRET_KEY`: Secret Key for Hetzner Object Storage.
-*   `S3_BUCKET_NAME`: The name of the S3 bucket you created.
 *   `SSH_KEY_NAME`: The name of the SSH Key in Hetzner.
 
 ### Configuration Variables (Optional)
