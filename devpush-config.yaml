@@ -1,0 +1,56 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - docker.io
+  - docker-compose-v2
+  - curl
+  - git
+
+users:
+  - name: deploy
+    groups: sudo, docker
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/99-disable-root-login.conf
+    content: |
+      PermitRootLogin no
+      PasswordAuthentication no
+    permissions: '0644'
+  - path: /tmp/devpush.env.custom
+    content: |     
+      APP_HOSTNAME=devpush.${domain_name}
+      DEPLOY_DOMAIN=${domain_name}
+      LE_EMAIL=admin@${domain_name}
+      CERT_CHALLENGE_PROVIDER=cloudflare
+      CF_DNS_API_TOKEN=${devpush_cloudflare_api_token}
+      
+      GITHUB_APP_ID=${devpush_github_app_id}
+      GITHUB_APP_NAME=${devpush_github_app_name}
+      GITHUB_APP_PRIVATE_KEY='${devpush_github_app_private_key}'
+      GITHUB_APP_WEBHOOK_SECRET=${devpush_github_app_webhook_secret}
+      GITHUB_APP_CLIENT_ID=${devpush_github_app_client_id}
+      GITHUB_APP_CLIENT_SECRET=${devpush_github_app_client_secret}
+      
+      # Email
+      EMAIL_SENDER_ADDRESS=devpush@${domain_name}
+      RESEND_API_KEY=${devpush_resend_api_key}
+    permissions: '0600'
+  - path: /usr/local/bin/merge-env.sh
+    content: |
+      ${indent(6, merge_env_script)}
+    permissions: '0755'
+
+runcmd:
+  - systemctl restart ssh
+  - curl -fsSL https://get.devpu.sh | bash
+  - /usr/local/bin/merge-env.sh
+  - systemctl daemon-reload
+  # Wait up to 30 seconds for the service file to actually exist before enabling
+  - timeout 30s bash -c 'until systemctl enable --now devpush.service; do sleep 5; done'
+  - systemctl status devpush.service

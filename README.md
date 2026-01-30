@@ -14,107 +14,54 @@ This repository contains the Terraform configuration to bootstrap a foundational
 
 ## Prerequisites
 
-1.  **Terraform** (>= 1.5.0) installed (for initial bootstrap).
-2.  **Hetzner Cloud Token** (Read/Write).
-3.  **Cloudflare API Token** (Edit DNS).
-4.  **Hetzner Object Storage Credentials** (Access Key & Secret Key).
-5.  **SSH Key** already added to Hetzner Cloud.
+1.  **Terraform** (>= 1.14.3) installed (for initial bootstrap).
+2.  **Hetzner Object Storage Credentials** (Access Key & Secret Key).
+3.  **Hetzner Cloud Token** (Read/Write).
+4.  **Cloudflare API Token** (Edit DNS).
 
-## Bootstrap (Initial Setup)
+## GitHub Repository Secrets
 
-To get started, you must first create the S3 bucket and migrate the state.
+Configure the following secrets in your GitHub repository settings to enable the automated workflow and server configuration:
 
-### Step 1: Create the Bucket (Local)
+| Secret Name | Description |
+|---|---|
+| `AWS_ACCESS_KEY_ID` | Access Key for Terraform Backend (Hetzner Object Storage/S3) |
+| `AWS_SECRET_ACCESS_KEY` | Secret Key for Terraform Backend |
+| `HCLOUD_TOKEN` | Hetzner Cloud API Token |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API Token for DNS and SSL (Infrastructure) |
+| `DEVPUSH_CLOUDFLARE_API_TOKEN` | Cloudflare API Token for Application (DNS Challenges) |
+| `SSH_KEY_NAME` | Name of the SSH key uploaded to Hetzner Cloud |
+| `DEVPUSH_GH_APP_ID` | GitHub App ID |
+| `DEVPUSH_GH_APP_NAME` | GitHub App Name (slug) |
+| `DEVPUSH_GH_APP_PRIVATE_KEY` | GitHub App Private Key (PEM format) |
+| `DEVPUSH_GH_APP_WEBHOOK_SECRET` | GitHub App Webhook Secret |
+| `DEVPUSH_GH_APP_CLIENT_ID` | GitHub App Client ID |
+| `DEVPUSH_GH_APP_CLIENT_SECRET` | GitHub App Client Secret |
+| `DEVPUSH_RESEND_API_KEY` | Resend.com API Key for emails |
 
-1.  **Important**: Rename `backend.tf` to `backend.tf.disabled` temporarily. This prevents Terraform from trying to connect to the non-existent bucket during initialization.
-    ```bash
-    mv backend.tf backend.tf.disabled
-    ```
-2.  Initialize Terraform locally:
-    ```bash
-    terraform init
-    ```
-3.  Create a `terraform.tfvars` file (DO NOT COMMIT):
-    ```hcl
-    hcloud_token         = "your-hcloud-token"
-    cloudflare_api_token = "your-cf-token"
-    ssh_key_name         = "your-ssh-key-name"
-    domain_name          = "collis.digital"
-    s3_access_key        = "your-access-key"
-    s3_secret_key        = "your-secret-key"
-    s3_bucket_name       = "your-unique-bucket-name"
-    ```
-4.  Apply just the bucket resources:
-    ```bash
-    terraform apply -target=aws_s3_bucket.terraform_state -target=aws_s3_bucket_versioning.terraform_state
-    ```
+## Repository Variables
 
-### Step 2: Configure the Backend
+| Variable Name | Description | Default |
+|---|---|---|
+| `DOMAIN_NAME` | Base domain name | `collis.digital` |
 
-1.  Restore the `backend.tf` file:
-    ```bash
-    mv backend.tf.disabled backend.tf
-    ```
-2.  Edit `backend.tf`:
-    *   Replace `devpush-terraform-state` with your actual bucket name (the one you set in `terraform.tfvars`).
-    *   Ensure the `endpoint` matches your Object Storage region (default is `fsn1`).
-3.  Initialize the backend (migrating local state to S3):
-    ```bash
-    export AWS_ACCESS_KEY_ID="your-access-key"
-    export AWS_SECRET_ACCESS_KEY="your-secret-key"
-    terraform init -migrate-state
-    ```
-4.  Commit and push the updated `backend.tf`.
+## Usage
 
-## CI/CD with GitHub Actions
+The provisioning process is automated via GitHub Actions and Cloud-Init.
 
-This repository is configured with GitHub Actions to automate Infrastructure changes.
+1.  **Push to Main**: The `terraform.yml` workflow applies the infrastructure changes.
+2.  **Server Provisioning**:
+    *   Terraform provisions the server and injects the configuration via Cloud-Init.
+    *   The `devpush.env` file is automatically populated with values from the repository and secrets.
+    *   The `/dev/push` installation script runs automatically.
+3.  **Completion**:
+    *   Once the server is up (approx. 2-5 minutes), the application should be available at `https://devpush.collis.digital`.
 
-### Required Secrets
+## Manual Verification
 
-Go to **Settings > Secrets and variables > Actions** in your GitHub repository and add the following repository secrets:
+If needed, you can SSH into the server to verify the configuration:
 
-*   `HCLOUD_TOKEN`: Your Hetzner Cloud API Token.
-*   `CLOUDFLARE_API_TOKEN`: Your Cloudflare API Token.
-*   `S3_ACCESS_KEY`: Access Key for Hetzner Object Storage.
-*   `S3_SECRET_KEY`: Secret Key for Hetzner Object Storage.
-*   `S3_BUCKET_NAME`: The name of the S3 bucket you created.
-*   `SSH_KEY_NAME`: The name of the SSH Key in Hetzner.
-
-### Configuration Variables (Optional)
-
-You can set these as **Variables** (not secrets):
-
-*   `DOMAIN_NAME`: e.g., `collis.digital` (Defaults to `collis.digital` if unset).
-
-### Workflow
-
-1.  **Pull Request**: Terraform initializes and runs `plan`. The plan output is posted as a comment on the PR.
-2.  **Push to Main**: Terraform runs `apply` automatically.
-
-## Post-Provisioning Configuration
-
-After the server is up:
-
-1.  **Create a GitHub App**:
-    *   Follow the guide: [Create GitHub App](https://devpu.sh/docs/guides/create-github-app/)
-    *   Homepage URL: `https://devpush.collis.digital`
-    *   Callback URL: `https://devpush.collis.digital/auth/github/callback`
-    *   Webhook URL: `https://devpush.collis.digital/api/webhooks/github`
-
-2.  **Configure the Server**:
-    *   SSH into the server (using the direct unproxied record):
-        ```bash
-        ssh deploy@direct.collis.digital
-        ```
-    *   Edit the configuration file using the provided template:
-        ```bash
-        sudo nano /var/lib/devpush/.env
-        ```
-    *   Copy the content from `devpush.env` in this repository, filling in your GitHub App credentials, Resend API key, and Cloudflare Token.
-    *   Save and exit.
-
-3.  **Start DevPush**:
-    ```bash
-    sudo systemctl enable --now devpush
-    ```
+```bash
+ssh deploy@direct.collis.digital
+cat /var/lib/devpush/.env
+```

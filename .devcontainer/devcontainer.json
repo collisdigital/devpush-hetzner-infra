@@ -1,0 +1,43 @@
+{
+  "name": "Terraform Cloudflare DNS",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/terraform:1": {
+      "version": "1.14.3",
+      "tflint": "latest",
+      "terragrunt": "none"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/git-lfs:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "hashicorp.terraform",
+        "hashicorp.hcl",
+        "redhat.vscode-yaml",
+        "github.vscode-github-actions",
+        "mads-hartmann.bash-ide-vscode",
+        "EditorConfig.EditorConfig"
+      ],
+      "settings": {
+        "terraform.languageServer.enable": true,
+        "terraform.validation.enableEnhancedValidation": true,
+        "[terraform]": {
+          "editor.defaultFormatter": "hashicorp.terraform",
+          "editor.formatOnSave": true
+        },
+        "[terraform-vars]": {
+          "editor.defaultFormatter": "hashicorp.terraform",
+          "editor.formatOnSave": true
+        },
+        "files.associations": {
+          "*.tf": "terraform",
+          "*.tfvars": "terraform-vars"
+        }
+      }
+    }
+  },
+  "postCreateCommand": "terraform version && tflint --version",
+  "remoteUser": "vscode"
+}

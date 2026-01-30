@@ -1,30 +1,37 @@
+# Look up the existing zone id
 data "cloudflare_zone" "main" {
-  name = var.domain_name
+  filter = {
+    name = var.domain_name
+  }
 }
 
 # A record for devpush.collis.digital (Proxied for Web/SSL)
-resource "cloudflare_record" "devpush_app" {
+resource "cloudflare_dns_record" "devpush_app" {
   zone_id = data.cloudflare_zone.main.id
   name    = "devpush"
-  value   = hcloud_server.devpush.ipv4_address
-  type    = "A"
+  content = hcloud_server.devpush.ipv6_address
+  type    = "AAAA"
   proxied = true
+  ttl     = 1 # Automatic
 }
 
 # Wildcard CNAME *.collis.digital pointing to devpush.collis.digital
-resource "cloudflare_record" "wildcard" {
+resource "cloudflare_dns_record" "wildcard" {
   zone_id = data.cloudflare_zone.main.id
   name    = "*"
-  value   = "devpush.${var.domain_name}"
+  content = "devpush.${var.domain_name}"
   type    = "CNAME"
   proxied = false
+  ttl     = 1 # Automatic
+
 }
 
 # Unproxied A record for SSH access (direct.collis.digital)
-resource "cloudflare_record" "direct" {
+resource "cloudflare_dns_record" "direct" {
   zone_id = data.cloudflare_zone.main.id
   name    = "direct"
-  value   = hcloud_server.devpush.ipv4_address
-  type    = "A"
+  content = hcloud_server.devpush.ipv6_address
+  type    = "AAAA"
   proxied = false
+  ttl     = 1 # Automatic
 }

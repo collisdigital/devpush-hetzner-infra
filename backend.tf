@@ -1,9 +1,12 @@
 terraform {
   backend "s3" {
-    bucket   = "devpush-terraform-state" # REPLACE THIS WITH YOUR UNIQUE BUCKET NAME
-    key      = "devpush/terraform.tfstate"
-    region   = "fsn1"
-    endpoint = "https://fsn1.your-objectstorage.com"
+    bucket = "collis-digital-devpush-hetzner"
+    key    = "devpush/terraform.tfstate"
+    region = "nbg1"
+
+    endpoints = {
+      s3 = "https://nbg1.your-objectstorage.com"
+    }
 
     # S3-compatible configuration for Hetzner Object Storage
     skip_credentials_validation = true
