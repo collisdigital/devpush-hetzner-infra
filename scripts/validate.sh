@@ -1,13 +1,10 @@
 #!/bin/bash
 set -e
 
-echo "Running terraform fmt -check..."
-terraform fmt -check
+echo "Running Terraform Format Check..."
+terraform fmt -check -recursive
 
-echo "Running terraform init -backend=false..."
-terraform init -backend=false
-
-echo "Running terraform validate..."
+echo "Running Terraform Validate..."
 terraform validate
 
-echo "Done"
+echo "Validation successful!"

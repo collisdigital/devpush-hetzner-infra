@@ -39,7 +39,7 @@ variable "s3_bucket_name" {
 }
 
 variable "s3_region" {
-  description = "Region for Hetzner Object Storage (e.g., fsn1)"
+  description = "Region for Hetzner Object Storage (e.g., nbg1)"
   type        = string
-  default     = "fsn1"
+  default     = "nbg1"
 }
