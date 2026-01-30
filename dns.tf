@@ -15,6 +15,15 @@ resource "cloudflare_dns_record" "devpush_app" {
   ttl     = 1 # Automatic
 }
 
+resource "cloudflare_dns_record" "devpush_app_v4" {
+  zone_id = data.cloudflare_zone.main.id
+  name    = "devpush"
+  content = hcloud_server.devpush.ipv4_address
+  type    = "A"
+  proxied = true
+  ttl     = 1 # Automatic
+}
+
 # Wildcard CNAME *.collis.digital pointing to devpush.collis.digital
 resource "cloudflare_dns_record" "wildcard" {
   zone_id = data.cloudflare_zone.main.id
@@ -32,6 +41,15 @@ resource "cloudflare_dns_record" "direct" {
   name    = "direct"
   content = hcloud_server.devpush.ipv6_address
   type    = "AAAA"
+  proxied = false
+  ttl     = 1 # Automatic
+}
+
+resource "cloudflare_dns_record" "direct_v4" {
+  zone_id = data.cloudflare_zone.main.id
+  name    = "direct"
+  content = hcloud_server.devpush.ipv4_address
+  type    = "A"
   proxied = false
   ttl     = 1 # Automatic
 }
