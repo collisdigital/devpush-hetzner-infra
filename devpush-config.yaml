@@ -50,4 +50,7 @@ runcmd:
   - systemctl restart ssh
   - curl -fsSL https://get.devpu.sh | bash
   - /usr/local/bin/merge-env.sh
-  - sudo systemctl start devpush.service
+  - systemctl daemon-reload
+  # Wait up to 30 seconds for the service file to actually exist before enabling
+  - timeout 30s bash -c 'until systemctl enable --now devpush.service; do sleep 5; done'
+  - systemctl status devpush.service
