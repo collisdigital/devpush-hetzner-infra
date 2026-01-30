@@ -9,8 +9,8 @@ data "cloudflare_zone" "main" {
 resource "cloudflare_dns_record" "devpush_app" {
   zone_id = data.cloudflare_zone.main.id
   name    = "devpush"
-  content = hcloud_server.devpush.ipv4_address
-  type    = "A"
+  content = hcloud_server.devpush.ipv6_address
+  type    = "AAAA"
   proxied = true
   ttl     = 1 # Automatic
 }
@@ -30,8 +30,8 @@ resource "cloudflare_dns_record" "wildcard" {
 resource "cloudflare_dns_record" "direct" {
   zone_id = data.cloudflare_zone.main.id
   name    = "direct"
-  content = hcloud_server.devpush.ipv4_address
-  type    = "A"
+  content = hcloud_server.devpush.ipv6_address
+  type    = "AAAA"
   proxied = false
   ttl     = 1 # Automatic
 }
