@@ -6,7 +6,7 @@ resource "hcloud_primary_ip" "devpush_ipv4" {
   name          = "devpush_ipv4"
   type          = "ipv4"
   assignee_type = "server"
-  auto_delete   = false
+  auto_delete   = true
   location      = "nbg1"
 }
 
@@ -14,7 +14,7 @@ resource "hcloud_primary_ip" "devpush_ipv6" {
   name          = "devpush_ipv6"
   type          = "ipv6"
   assignee_type = "server"
-  auto_delete   = false
+  auto_delete   = true
   location      = "nbg1"
 }
 

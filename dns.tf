@@ -35,19 +35,19 @@ resource "cloudflare_dns_record" "wildcard" {
 
 }
 
-# Unproxied A record for SSH access (direct.collis.digital)
-resource "cloudflare_dns_record" "direct" {
+# Unproxied A record for SSH access (devpush-direct.collis.digital)
+resource "cloudflare_dns_record" "devpush_direct_v6" {
   zone_id = data.cloudflare_zone.main.id
-  name    = "direct"
+  name    = "devpush-direct"
   content = hcloud_primary_ip.devpush_ipv6.ip_address
   type    = "AAAA"
   proxied = false
   ttl     = 1 # Automatic
 }
 
-resource "cloudflare_dns_record" "direct_v4" {
+resource "cloudflare_dns_record" "devpush_direct_v4" {
   zone_id = data.cloudflare_zone.main.id
-  name    = "direct"
+  name    = "devpush-direct"
   content = hcloud_primary_ip.devpush_ipv4.ip_address
   type    = "A"
   proxied = false
