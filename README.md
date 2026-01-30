@@ -9,7 +9,7 @@ This repository contains the Terraform configuration to bootstrap a foundational
 *   **DNS**: Managed by Cloudflare.
     *   `devpush.collis.digital` -> Server IP (Proxied)
     *   `*.collis.digital` -> `devpush.collis.digital` (Unproxied, managed by devpush)
-    *   `direct.collis.digital` -> Server IP (Unproxied, for SSH)
+    *   `devpush-direct.collis.digital` -> Server IP (Unproxied, for SSH)
 *   **State**: Terraform state is stored in Hetzner Object Storage (S3-compatible).
 
 ## Prerequisites
@@ -62,6 +62,6 @@ The provisioning process is automated via GitHub Actions and Cloud-Init.
 If needed, you can SSH into the server to verify the configuration:
 
 ```bash
-ssh deploy@direct.collis.digital
+ssh deploy@devpush-direct.collis.digital
 cat /var/lib/devpush/.env
 ```
