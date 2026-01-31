@@ -3,17 +3,23 @@ package_update: true
 package_upgrade: true
 
 packages:
-  - docker.io
   - curl
   - git
 
 users:
-  - name: devpush
-    groups: sudo, docker
+  # SSH login user - use this account to access the server
+  - name: ${ssh_login_username}
+    groups: sudo
     shell: /bin/bash
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     ssh_authorized_keys:
       - ${ssh_public_key}
+  # Devpush service account - system user with no login capability
+  - name: devpush
+    system: true
+    shell: /usr/sbin/nologin
+    no_create_home: false
+    homedir: /opt/devpush
 
 write_files:
   - path: /etc/ssh/sshd_config.d/99-disable-root-login.conf
@@ -46,9 +52,11 @@ write_files:
     permissions: '0755'
 
 runcmd:
+  # Restart SSH to apply configuration changes
   - systemctl restart ssh
-  # Prepare and mount the Hetzner volume
-  - mkdir -p /var/lib/devpush
+
+  # Prepare and mount the Hetzner volume to a standard location
+  - mkdir -p /mnt/devpush-volume
   - |
     # Wait for the volume to be attached (up to 60 seconds)
     for i in $(seq 1 12); do
@@ -57,6 +65,8 @@ runcmd:
       fi
       sleep 5
     done
+  
+  # Mount the Hetzner volume to /mnt/devpush-volume
   - |
     # Get the volume device path
     VOLUME_DEV=$(ls /dev/disk/by-id/scsi-0HC_Volume_* 2>/dev/null | head -1)
@@ -66,20 +76,54 @@ runcmd:
         mkfs.ext4 -F "$VOLUME_DEV"
       fi
       # Add to fstab if not already present
-      if ! grep -q '/var/lib/devpush' /etc/fstab; then
-        echo "$VOLUME_DEV /var/lib/devpush ext4 defaults,nofail 0 2" >> /etc/fstab
+      if ! grep -q '/mnt/devpush-volume' /etc/fstab; then
+        echo "$VOLUME_DEV /mnt/devpush-volume ext4 defaults,nofail 0 2" >> /etc/fstab
       fi
       # Mount the volume
-      mount /var/lib/devpush
+      mount /mnt/devpush-volume
     fi
-  - chown -R devpush:devpush /var/lib/devpush
-  - chmod 0750 /var/lib/devpush
-  - mkdir -p /opt/devpush
-  - chown -R devpush:devpush /opt/devpush
-  - chmod 0750 /opt/devpush
-  - curl -fsSL https://install.devpu.sh | sudo bash -s -- --verbose --yes
+  
+  # Create the devpush root folder structure on the volume with unique names
+  - | 
+    mkdir -p /mnt/devpush-volume/devpush/opt
+    mkdir -p /mnt/devpush-volume/devpush/var-lib
+    mkdir -p /mnt/devpush-volume/devpush/var-backups
+    chown -R devpush:devpush /mnt/devpush-volume/devpush
+    chmod 0750 /mnt/devpush-volume/devpush
+  
+  # Create parent directories and symlinks for devpush directories
+  - |
+    mkdir -p /opt /var/lib /var/backups
+    ln -sfn /mnt/devpush-volume/devpush/opt /opt/devpush
+    ln -sfn /mnt/devpush-volume/devpush/var-lib /var/lib/devpush
+    ln -sfn /mnt/devpush-volume/devpush/var-backups /var/backups/devpush
+  
+  # Install Devpush (retry up to 5 times with 30 second sleep between retries)
+  - |
+    for attempt in $(seq 1 5); do
+      echo "Devpush install attempt $attempt of 5..."
+      if curl -fsSL https://install.devpu.sh | sudo bash -s -- --verbose --yes; then
+        echo "Devpush installed successfully on attempt $attempt"
+        break
+      fi
+      if [ "$attempt" -lt 5 ]; then
+        echo "Devpush install failed, retrying in 30 seconds..."
+        sleep 30
+      else
+        echo "Devpush install failed after 5 attempts"
+        exit 1
+      fi
+    done
+
+  # Merge environment variables and restart the Devpush service
+  - echo "Merging custom environment variables into Devpush configuration..."
   - /usr/local/bin/merge-env.sh
+
+  - echo "Reloading systemd daemon configuration..."
   - systemctl daemon-reload
-  # Wait up to 30 seconds for the service file to actually exist before enabling
+
+  - echo "Enabling and starting the Devpush service (waiting up to 30 seconds)..."
   - timeout 30s bash -c 'until systemctl enable --now devpush.service; do sleep 5; done'
+
+  - echo "Checking Devpush service status..."
   - systemctl status devpush.service

@@ -21,3 +21,21 @@ variable "domain_name" {
   default     = "collis.digital"
 }
 
+variable "ssh_login_username" {
+  description = "Username for SSH login (separate from the devpush service account)"
+  type        = string
+  default     = "admin"
+}
+
+variable "hetzner_location" {
+  description = "Hetzner datacenter location (e.g., nbg1, fsn1, hel1)"
+  type        = string
+  default     = "nbg1"
+}
+
+variable "devpush_volume_size" {
+  description = "Size of the DevPush storage volume in GB"
+  type        = number
+  default     = 10
+}
+
