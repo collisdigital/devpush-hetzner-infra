@@ -43,12 +43,12 @@ else
     # Add a newline just in case the file doesn't end with one
     echo "" >> "$CONFIG_FILE"
     cat <<EOF >> "$CONFIG_FILE"
-        Host $HOST_ALIAS
-        HostName $HOSTNAME
-        User $USER
-        IdentityFile $KEY_FILE
-        StrictHostKeyChecking accept-new
-    EOF
+Host $HOST_ALIAS
+HostName $HOSTNAME
+User $USER
+IdentityFile $KEY_FILE
+StrictHostKeyChecking accept-new
+EOF
 fi
 
 echo "Setup complete. You can now connect using: ssh $HOST_ALIAS"

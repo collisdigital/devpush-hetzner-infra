@@ -92,6 +92,16 @@ ssh devpush
 > (`admin@devpush-direct.collis.digital`). If you have customized variables,
 > you may need to adjust `scripts/ssh_setup.sh` or your `~/.ssh/config` manually.
 
+## Development Helpers
+
+A `Makefile` is included to provide shortcuts for common development tasks:
+
+| Command           | Description                                                        |
+| ----------------- | ------------------------------------------------------------------ |
+| `make validate`   | Validates the Terraform configuration.                             |
+| `make lint`       | Runs TFLint to check for potential errors and best practices.      |
+| `make setup-ssh`  | Sets up the local SSH config using the `HCLOUD_SSH_KEY` secret.    |
+| `make connect`    | Runs `setup-ssh` and then immediately connects to the server.      |
 
 ## Useful Notes
 
