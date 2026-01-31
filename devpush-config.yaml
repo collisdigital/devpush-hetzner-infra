@@ -22,7 +22,7 @@ write_files:
       PermitRootLogin no
       PasswordAuthentication no
     permissions: '0644'
-  - path: /tmp/devpush.env.custom
+  - path: /etc/opt/devpush/.env.custom
     content: |     
       APP_HOSTNAME=devpush.${domain_name}
       DEPLOY_DOMAIN=${domain_name}
@@ -48,7 +48,34 @@ write_files:
 
 runcmd:
   - systemctl restart ssh
-  - curl -fsSL https://get.devpu.sh | bash
+  # Prepare and mount the Hetzner volume
+  - mkdir -p /var/lib/devpush
+  - |
+    # Wait for the volume to be attached (up to 60 seconds)
+    for i in $(seq 1 12); do
+      if [ -b /dev/disk/by-id/scsi-0HC_Volume_* ]; then
+        break
+      fi
+      sleep 5
+    done
+  - |
+    # Get the volume device path
+    VOLUME_DEV=$(ls /dev/disk/by-id/scsi-0HC_Volume_* 2>/dev/null | head -1)
+    if [ -n "$VOLUME_DEV" ]; then
+      # Check if already has a filesystem, if not format it
+      if ! blkid "$VOLUME_DEV" | grep -q 'TYPE='; then
+        mkfs.ext4 -F "$VOLUME_DEV"
+      fi
+      # Add to fstab if not already present
+      if ! grep -q '/var/lib/devpush' /etc/fstab; then
+        echo "$VOLUME_DEV /var/lib/devpush ext4 defaults,nofail 0 2" >> /etc/fstab
+      fi
+      # Mount the volume
+      mount /var/lib/devpush
+    fi
+  - chown deploy:deploy /var/lib/devpush
+  - chmod 0750 /var/lib/devpush
+  - curl -fsSL https://install.devpu.sh | sudo bash
   - /usr/local/bin/merge-env.sh
   - systemctl daemon-reload
   # Wait up to 30 seconds for the service file to actually exist before enabling

@@ -46,3 +46,16 @@ resource "hcloud_server" "devpush" {
     ipv6 = hcloud_primary_ip.devpush_ipv6.id
   }
 }
+
+resource "hcloud_volume" "devpush_storage" {
+  name     = "devpush-storage"
+  size     = 10
+  location = "nbg1"
+  format   = "ext4"
+}
+
+resource "hcloud_volume_attachment" "devpush_storage" {
+  volume_id = hcloud_volume.devpush_storage.id
+  server_id = hcloud_server.devpush.id
+  automount = false
+}
