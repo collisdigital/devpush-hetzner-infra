@@ -22,7 +22,7 @@ write_files:
       PermitRootLogin no
       PasswordAuthentication no
     permissions: '0644'
-  - path: /tmp/devpush.env.custom
+  - path: /etc/opt/devpush/.env.custom
     content: |     
       APP_HOSTNAME=devpush.${domain_name}
       DEPLOY_DOMAIN=${domain_name}
@@ -48,7 +48,7 @@ write_files:
 
 runcmd:
   - systemctl restart ssh
-  - curl -fsSL https://get.devpu.sh | bash
+  - curl -fsSL https://install.devpu.sh | sudo bash
   - /usr/local/bin/merge-env.sh
   - systemctl daemon-reload
   # Wait up to 30 seconds for the service file to actually exist before enabling
