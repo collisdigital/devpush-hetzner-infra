@@ -3,7 +3,7 @@ set -e
 
 # Update .env with custom values while preserving auto-generated secrets
 TARGET="/var/lib/devpush/.env"
-SOURCE="/etc/opt/devpush/.env.custom
+SOURCE="/etc/opt/devpush/.env.custom"
 
 # Read source file line by line
 while IFS= read -r line || [ -n "$line" ]; do
