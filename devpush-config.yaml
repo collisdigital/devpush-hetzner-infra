@@ -37,7 +37,7 @@ write_files:
       
       GITHUB_APP_ID=${devpush_github_app_id}
       GITHUB_APP_NAME=${devpush_github_app_name}
-      GITHUB_APP_PRIVATE_KEY='${devpush_github_app_private_key}'
+      GITHUB_APP_PRIVATE_KEY=${devpush_github_app_private_key}
       GITHUB_APP_WEBHOOK_SECRET=${devpush_github_app_webhook_secret}
       GITHUB_APP_CLIENT_ID=${devpush_github_app_client_id}
       GITHUB_APP_CLIENT_SECRET=${devpush_github_app_client_secret}
