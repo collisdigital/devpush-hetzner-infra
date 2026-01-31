@@ -7,7 +7,7 @@ resource "hcloud_primary_ip" "devpush_ipv4" {
   type          = "ipv4"
   assignee_type = "server"
   auto_delete   = true
-  location      = "nbg1"
+  datacenter    = "nbg1-dc3"
 }
 
 resource "hcloud_primary_ip" "devpush_ipv6" {
@@ -15,14 +15,14 @@ resource "hcloud_primary_ip" "devpush_ipv6" {
   type          = "ipv6"
   assignee_type = "server"
   auto_delete   = true
-  location      = "nbg1"
+  datacenter    = "nbg1-dc3"
 }
 
 resource "hcloud_server" "devpush" {
   name         = "devpush"
   image        = "ubuntu-24.04"
   server_type  = "cax11"
-  location     = "nbg1"
+  datacenter   = "nbg1-dc3"
   ssh_keys     = [data.hcloud_ssh_key.main.id]
   firewall_ids = [hcloud_firewall.devpush.id]
   backups      = true
