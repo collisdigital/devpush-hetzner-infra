@@ -72,12 +72,12 @@ runcmd:
       # Mount the volume
       mount /var/lib/devpush
     fi
-  - chown devpush:devpush /var/lib/devpush
+  - chown -R devpush:devpush /var/lib/devpush
   - chmod 0750 /var/lib/devpush
   - mkdir -p /opt/devpush
-  - chown devpush:devpush /opt/devpush
+  - chown -R devpush:devpush /opt/devpush
   - chmod 0750 /opt/devpush
-  - curl -fsSL https://install.devpu.sh | sudo bash
+  - curl -fsSL https://install.devpu.sh | sudo bash -s -- --verbose --yes
   - /usr/local/bin/merge-env.sh
   - systemctl daemon-reload
   # Wait up to 30 seconds for the service file to actually exist before enabling
