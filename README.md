@@ -62,6 +62,6 @@ The provisioning process is automated via GitHub Actions and Cloud-Init.
 If needed, you can SSH into the server to verify the configuration:
 
 ```bash
-ssh deploy@devpush-direct.collis.digital
+ssh devpush@devpush-direct.collis.digital
 cat /var/lib/devpush/.env
 ```

@@ -4,7 +4,7 @@ output "server_ip" {
 }
 
 output "ssh_command" {
-  value       = "ssh deploy@devpush-direct.${var.domain_name}"
+  value       = "ssh devpush@devpush-direct.${var.domain_name}"
   description = "Command to SSH into the server"
 }
 
