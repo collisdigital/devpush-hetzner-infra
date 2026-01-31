@@ -81,6 +81,9 @@ runcmd:
       fi
       # Mount the volume
       mount /mnt/devpush-volume
+
+      # Allow others to 'traverse' the mount point
+      chmod o+x /mnt/devpush-volume
     fi
   
   # Create the devpush root folder structure on the volume with unique names
