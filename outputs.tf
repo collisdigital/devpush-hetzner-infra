@@ -9,12 +9,12 @@ output "server_ipv6" {
 }
 
 output "ssh_command" {
-  value       = "ssh -i <ssh_key_path> ${var.ssh_login_username}@${cloudflare_dns_record.devpush_direct_v4.name}.${var.domain_name}"
+  value       = "ssh -i <ssh_key_path> ${var.ssh_login_username}@${cloudflare_dns_record.devpush_direct_v4.name}"
   description = "Command to SSH into the server"
 }
 
 output "devpush_url" {
-  value       = "https://${cloudflare_dns_record.devpush_app.name}.${var.domain_name}"
+  value       = "https://${cloudflare_dns_record.devpush_app.name}"
   description = "URL of the DevPush dashboard"
 }
 
