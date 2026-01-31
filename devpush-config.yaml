@@ -9,7 +9,7 @@ packages:
   - git
 
 users:
-  - name: deploy
+  - name: devpush
     groups: sudo, docker
     shell: /bin/bash
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
@@ -73,8 +73,11 @@ runcmd:
       # Mount the volume
       mount /var/lib/devpush
     fi
-  - chown deploy:deploy /var/lib/devpush
+  - chown devpush:devpush /var/lib/devpush
   - chmod 0750 /var/lib/devpush
+  - mkdir -p /opt/devpush
+  - chown devpush:devpush /opt/devpush
+  - chmod 0750 /opt/devpush
   - curl -fsSL https://install.devpu.sh | sudo bash
   - /usr/local/bin/merge-env.sh
   - systemctl daemon-reload
