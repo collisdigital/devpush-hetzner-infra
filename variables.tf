@@ -10,6 +10,18 @@ variable "cloudflare_api_token" {
   sensitive   = true
 }
 
+variable "cloudflare_account_id" {
+  description = "Cloudflare Account ID (required for Zero Trust resources)"
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudflare_access_email" {
+  description = "Email address allowed to access the protected applications"
+  type        = string
+  sensitive   = true
+}
+
 variable "ssh_key_name" {
   description = "Name of the existing SSH key in Hetzner Cloud"
   type        = string
@@ -38,4 +50,3 @@ variable "devpush_volume_size" {
   type        = number
   default     = 10
 }
-

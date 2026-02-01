@@ -130,3 +130,10 @@ runcmd:
 
   - echo "Checking Devpush service status..."
   - systemctl status devpush.service
+
+  # Install Cloudflare Tunnel Agent
+  - echo "Installing Cloudflared..."
+  - curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+  - dpkg -i cloudflared.deb
+  - echo "Configuring Cloudflared Tunnel..."
+  - cloudflared service install ${tunnel_token}
