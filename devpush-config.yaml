@@ -137,3 +137,6 @@ runcmd:
   - dpkg -i cloudflared.deb
   - echo "Configuring Cloudflared Tunnel..."
   - cloudflared service install ${tunnel_token}
+  - echo "Starting Cloudflared Tunnel..."
+  - systemctl enable --now cloudflared
+  - systemctl status cloudflared

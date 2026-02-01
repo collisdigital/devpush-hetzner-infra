@@ -26,13 +26,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "devpush_config" {
       },
       {
         service  = "http_status:404"
-        hostname = null # Explicitly null or omit? List elements must match types.
-        # Check if hostname is optional. Schema said yes.
-        # But in a list of objects, all objects must have same keys?
-        # Terraform HCL object lists usually require consistent keys if using `object(...)` type.
-        # If it's `list(map(string))`, keys can vary but values must be strings.
-        # Schema says `ingress` is a list. Nested type attributes.
-        # If I omit hostname, it might be fine.
+        hostname = null
       }
     ]
   }
