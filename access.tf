@@ -1,8 +1,15 @@
 resource "cloudflare_zero_trust_access_application" "devpush_access_app" {
-  account_id          = var.cloudflare_account_id
-  name                = "DevPush Protected Ecosystem"
-  type                = "self_hosted"
-  self_hosted_domains = ["devpush.${var.domain_name}", "*.${var.domain_name}"]
+  account_id = var.cloudflare_account_id
+  name       = "DevPush Protected Ecosystem"
+  type       = "self_hosted"
+  destinations = [
+    {
+      uri = "devpush.${var.domain_name}"
+    },
+    {
+      uri = "*.${var.domain_name}"
+    }
+  ]
 
   policies = [
     {
