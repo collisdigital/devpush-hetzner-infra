@@ -25,7 +25,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "devpush_config" {
       },
       {
         hostname = "*.${var.domain_name}"
-        service  = "httsp://localhost:443"
+        service  = "https://localhost:443"
         origin_request = {
           no_tls_verify = true
         }
