@@ -17,14 +17,18 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "devpush_config" {
   config = {
     ingress = [
       {
-        hostname      = "devpush.${var.domain_name}"
-        service       = "https://localhost:443"
-        no_tls_verify = "true"
+        hostname = "devpush.${var.domain_name}"
+        service  = "https://localhost:443"
+        origin_request = {
+          no_tls_verify = true
+        }
       },
       {
-        hostname      = "*.${var.domain_name}"
-        service       = "https://localhost:443"
-        no_tls_verify = "true"
+        hostname = "*.${var.domain_name}"
+        service  = "httsp://localhost:443"
+        origin_request = {
+          no_tls_verify = true
+        }
       },
       {
         service  = "http_status:404"
