@@ -18,11 +18,11 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "devpush_config" {
     ingress = [
       {
         hostname = "devpush.${var.domain_name}"
-        service  = "http://localhost:80"
+        service  = "http://localhost:443"
       },
       {
         hostname = "*.${var.domain_name}"
-        service  = "http://localhost:80"
+        service  = "http://localhost:443"
       },
       {
         service  = "http_status:404"
