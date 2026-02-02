@@ -28,9 +28,8 @@ variable "ssh_key_name" {
 }
 
 variable "domain_name" {
-  description = "Base domain name (e.g., collis.digital)"
+  description = "Base domain name (e.g., example.com)"
   type        = string
-  default     = "collis.digital"
 }
 
 variable "ssh_login_username" {
@@ -39,10 +38,28 @@ variable "ssh_login_username" {
   default     = "admin"
 }
 
+variable "devpush_service_username" {
+  description = "Username for the devpush service account"
+  type        = string
+  default     = "devpush"
+}
+
 variable "hetzner_location" {
   description = "Hetzner datacenter location (e.g., nbg1, fsn1, hel1)"
   type        = string
   default     = "nbg1"
+}
+
+variable "hcloud_server_type" {
+  description = "Hetzner Cloud Server Type"
+  type        = string
+  default     = "cax11"
+}
+
+variable "hcloud_image" {
+  description = "Hetzner Cloud Image"
+  type        = string
+  default     = "ubuntu-24.04"
 }
 
 variable "devpush_volume_size" {

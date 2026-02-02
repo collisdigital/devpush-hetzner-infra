@@ -10,12 +10,17 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   
+  TF_BACKEND_BUCKET: ${{ secrets.TF_BACKEND_BUCKET }}
+  TF_BACKEND_REGION: ${{ secrets.TF_BACKEND_REGION }}
+  TF_BACKEND_ENDPOINT: ${{ secrets.TF_BACKEND_ENDPOINT }}
+  TF_BACKEND_KEY: ${{ secrets.TF_BACKEND_KEY || 'devpush/terraform.tfstate' }}
+
   TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
   TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
   TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
   TF_VAR_cloudflare_access_email: ${{ secrets.CLOUDFLARE_ACCESS_EMAIL }}
   TF_VAR_ssh_key_name: ${{ secrets.SSH_KEY_NAME }}
-  TF_VAR_domain_name: ${{ vars.DOMAIN_NAME || 'collis.digital' }}
+  TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
   
   TF_VAR_devpush_cloudflare_api_token: ${{ secrets.DEVPUSH_CLOUDFLARE_API_TOKEN }}
   TF_VAR_devpush_github_app_id: ${{ secrets.DEVPUSH_GH_APP_ID }}
@@ -48,9 +53,27 @@ jobs:
         with:
           tflint_version: v0.60.0
 
+      - name: Configure Dynamic Variables
+        env:
+          VAR_SERVER_TYPE: ${{ vars.HCLOUD_SERVER_TYPE }}
+          VAR_IMAGE: ${{ vars.HCLOUD_IMAGE }}
+          VAR_SERVICE_USER: ${{ vars.DEVPUSH_SERVICE_USERNAME }}
+          VAR_VOLUME_SIZE: ${{ vars.DEVPUSH_VOLUME_SIZE }}
+        run: |
+          [ -n "$VAR_SERVER_TYPE" ] && echo "TF_VAR_hcloud_server_type=$VAR_SERVER_TYPE" >> $GITHUB_ENV
+          [ -n "$VAR_IMAGE" ] && echo "TF_VAR_hcloud_image=$VAR_IMAGE" >> $GITHUB_ENV
+          [ -n "$VAR_SERVICE_USER" ] && echo "TF_VAR_devpush_service_username=$VAR_SERVICE_USER" >> $GITHUB_ENV
+          [ -n "$VAR_VOLUME_SIZE" ] && echo "TF_VAR_devpush_volume_size=$VAR_VOLUME_SIZE" >> $GITHUB_ENV
+          echo "Dynamic variables configured."
+
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: |
+          terraform init \
+            -backend-config="bucket=${TF_BACKEND_BUCKET}" \
+            -backend-config="key=${TF_BACKEND_KEY}" \
+            -backend-config="region=${TF_BACKEND_REGION}" \
+            -backend-config="endpoint=${TF_BACKEND_ENDPOINT}"
 
       - name: Run TFLint
         id: tflint

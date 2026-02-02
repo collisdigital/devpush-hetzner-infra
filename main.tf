@@ -20,8 +20,8 @@ resource "hcloud_primary_ip" "devpush_ipv6" {
 
 resource "hcloud_server" "devpush" {
   name         = "devpush"
-  image        = "ubuntu-24.04"
-  server_type  = "cax11"
+  image        = var.hcloud_image
+  server_type  = var.hcloud_server_type
   location     = var.hetzner_location
   ssh_keys     = [data.hcloud_ssh_key.main.id]
   firewall_ids = [hcloud_firewall.devpush.id]
@@ -30,6 +30,7 @@ resource "hcloud_server" "devpush" {
   user_data = templatefile("${path.module}/devpush-config.yaml", {
     ssh_public_key                    = data.hcloud_ssh_key.main.public_key
     ssh_login_username                = var.ssh_login_username
+    devpush_service_username          = var.devpush_service_username
     domain_name                       = var.domain_name
     devpush_cloudflare_api_token      = var.devpush_cloudflare_api_token
     devpush_github_app_id             = var.devpush_github_app_id

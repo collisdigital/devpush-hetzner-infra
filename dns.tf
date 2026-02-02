@@ -5,7 +5,7 @@ data "cloudflare_zone" "main" {
   }
 }
 
-# CNAME record for devpush.collis.digital pointing to Tunnel
+# CNAME record for devpush.${var.domain_name} pointing to Tunnel
 resource "cloudflare_dns_record" "devpush_tunnel_cname" {
   zone_id = data.cloudflare_zone.main.id
   name    = "devpush"
@@ -15,7 +15,7 @@ resource "cloudflare_dns_record" "devpush_tunnel_cname" {
   ttl     = 1 # Automatic
 }
 
-# Wildcard CNAME *.collis.digital pointing to Tunnel
+# Wildcard CNAME *.${var.domain_name} pointing to Tunnel
 resource "cloudflare_dns_record" "wildcard" {
   zone_id = data.cloudflare_zone.main.id
   name    = "*"
@@ -25,7 +25,7 @@ resource "cloudflare_dns_record" "wildcard" {
   ttl     = 1 # Automatic
 }
 
-# Unproxied A record for SSH access (devpush-direct.collis.digital)
+# Unproxied A record for SSH access (devpush-direct.${var.domain_name})
 resource "cloudflare_dns_record" "devpush_direct_v6" {
   zone_id = data.cloudflare_zone.main.id
   name    = "devpush-direct"
