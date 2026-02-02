@@ -5,11 +5,14 @@ This repository contains the Terraform configuration to bootstrap a foundational
 ## Architecture
 
 *   **Server**: Hetzner Cloud `cpx11` (Ubuntu 24.04) in `nbg1` (Nuremberg).
-*   **Firewall**: Only ports 22 (SSH), 80 (HTTP), and 443 (HTTPS) are open.
+*   **Security**: Zero Trust architecture via Cloudflare Tunnel.
+    *   No public ingress ports (80/443 closed).
+    *   SSH access (Port 22) retained for operational support.
 *   **DNS**: Managed by Cloudflare.
-    *   `devpush.collis.digital` → Server IP (Proxied)
-    *   `*.collis.digital` → `devpush.collis.digital` (Unproxied, managed by devpush)
+    *   `devpush.collis.digital` → Cloudflare Tunnel (Proxied)
+    *   `*.collis.digital` → Cloudflare Tunnel (Proxied)
     *   `devpush-direct.collis.digital` → Server IP (Unproxied, for SSH)
+*   **Access Control**: Cloudflare Access protects web endpoints, allowing only authorized email addresses.
 *   **State**: Terraform state is stored in Hetzner Object Storage (S3-compatible).
 
 ## Prerequisites
@@ -17,7 +20,7 @@ This repository contains the Terraform configuration to bootstrap a foundational
 1.  **Terraform** (≥ 1.14.3) installed (for initial bootstrap).
 2.  **Hetzner Object Storage Credentials** (Access Key & Secret Key).
 3.  **Hetzner Cloud Token** (Read/Write).
-4.  **Cloudflare API Token** (Edit DNS).
+4.  **Cloudflare API Token** (Edit DNS, Zero Trust/Teams).
 
 ## Repository Settings
 
@@ -34,6 +37,8 @@ configuration:
 | `AWS_SECRET_ACCESS_KEY`          | Secret Key for Terraform Backend                              |
 | `HCLOUD_TOKEN`                   | Hetzner Cloud API Token                                       |
 | `CLOUDFLARE_API_TOKEN`           | Cloudflare API Token for DNS and SSL (Infrastructure)         |
+| `CLOUDFLARE_ACCOUNT_ID`          | Cloudflare Account ID (Required for Zero Trust/Tunnel)        |
+| `CLOUDFLARE_ACCESS_EMAIL`        | Email address authorized to access the application via Access |
 | `DEVPUSH_CLOUDFLARE_API_TOKEN`   | Cloudflare API Token for Application (DNS Challenges)         |
 | `SSH_KEY_NAME`                   | Name of the SSH key uploaded to Hetzner Cloud                 |
 | `DEVPUSH_GH_APP_ID`              | GitHub App ID                                                 |
@@ -64,11 +69,11 @@ The provisioning process is automated via GitHub Actions and Cloud-Init.
 
 1.  **Push to Main**: The `terraform.yml` workflow applies the infrastructure changes.
 2.  **Server Provisioning**:
-    *   Terraform provisions the server and injects the configuration via Cloud-Init.
-    *   The `devpush.env` file is automatically populated with values from the repository and secrets.
+    *   Terraform provisions the server, creates the Cloudflare Tunnel, and injects the configuration via Cloud-Init.
     *   The `devpush` installation script runs automatically.
+    *   The `cloudflared` service is installed and started, connecting the tunnel.
 3.  **Completion**:
-    *   Once the server is up (approx. 2-5 minutes), the application should be available at `https://devpush.collis.digital`.
+    *   Once the server is up (approx. 2-5 minutes), the application should be available at `https://devpush.collis.digital` (protected by Cloudflare Access).
 
 ## SSH into the Server
 

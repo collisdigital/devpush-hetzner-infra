@@ -12,28 +12,6 @@ resource "hcloud_firewall" "devpush" {
     ]
   }
 
-  # HTTP
-  rule {
-    direction = "in"
-    protocol  = "tcp"
-    port      = "80"
-    source_ips = [
-      "0.0.0.0/0",
-      "::/0"
-    ]
-  }
-
-  # HTTPS
-  rule {
-    direction = "in"
-    protocol  = "tcp"
-    port      = "443"
-    source_ips = [
-      "0.0.0.0/0",
-      "::/0"
-    ]
-  }
-
   # Allow all outbound traffic
   rule {
     direction = "out"
