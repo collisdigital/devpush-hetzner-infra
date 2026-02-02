@@ -19,12 +19,12 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "devpush_config" {
       {
         hostname      = "devpush.${var.domain_name}"
         service       = "https://localhost:443"
-        no_tls_verify = true
+        no_tls_verify = "true"
       },
       {
         hostname      = "*.${var.domain_name}"
-        service       = "httsp://localhost:443"
-        no_tls_verify = true
+        service       = "https://localhost:443"
+        no_tls_verify = "true"
       },
       {
         service  = "http_status:404"
