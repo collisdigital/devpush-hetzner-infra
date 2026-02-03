@@ -55,7 +55,12 @@ jobs:
 
       - name: Configure Environment
         run: |
-          # Map optional variables to their Terraform counterparts
+          # Map optional variables to their Terraform counterparts.
+          # We do this manually instead of using the top-level 'env' block because undefined GitHub Variables
+          # resolve to empty strings. If we passed those empty strings to Terraform, they would override
+          # the default values defined in 'variables.tf'. This logic ensures we only set the env var
+          # if a value is actually provided.
+
           # Format: SOURCE_VALUE:TARGET_TF_VAR
           # We inject the value directly from GitHub context
           MAPPINGS=(
