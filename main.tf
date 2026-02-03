@@ -1,5 +1,5 @@
 data "hcloud_ssh_key" "main" {
-  name = var.ssh_key_name
+  name = var.hcloud_ssh_key_name
 }
 
 resource "hcloud_primary_ip" "devpush_ipv4" {

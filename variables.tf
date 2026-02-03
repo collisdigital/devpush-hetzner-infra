@@ -22,7 +22,7 @@ variable "cloudflare_access_email" {
   sensitive   = true
 }
 
-variable "ssh_key_name" {
+variable "hcloud_ssh_key_name" {
   description = "Name of the existing SSH key in Hetzner Cloud"
   type        = string
 }

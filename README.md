@@ -21,7 +21,7 @@ This repository contains the Terraform configuration to bootstrap a foundational
 
 1.  **[Terraform](https://developer.hashicorp.com/terraform/downloads)** (≥ 1.14.3) installed.
 2.  **[Hetzner Cloud Account](https://console.hetzner.cloud/)** with a Project and API Token.
-3.  **[Hetzner Object Storage](https://docs.hetzner.com/cloud/networks-security/object-storage/)** (for Terraform state).
+3.  **[Hetzner Object Storage](https://docs.hetzner.com/cloud/networks-security/object-storage/)** (for Terraform state). See **Initial Setup & Bootstrapping** below for bucket details.
 4.  **[Cloudflare Account](https://dash.cloudflare.com/)** with an active zone (domain) and API Token.
 
 ## Initial Setup & Bootstrapping
@@ -121,21 +121,15 @@ To run Terraform locally, you need to set the same environment variables.
         # ... and so on
         ```
 
-3.  **Initialize**:
-    *   Run the init script to configure the environment and initialize Terraform:
+3.  **Check Environment & Initialize**:
+    *   Run the init script to configure the environment and initialize Terraform. This script also verifies that all required variables are set.
         ```bash
         ./scripts/init.sh
-        terraform init \
-          -backend-config="bucket=$TF_BACKEND_BUCKET" \
-          -backend-config="region=$TF_BACKEND_REGION" \
-          -backend-config="endpoint=$TF_BACKEND_ENDPOINT" \
-          -backend-config="access_key=$AWS_ACCESS_KEY_ID" \
-          -backend-config="secret_key=$AWS_SECRET_ACCESS_KEY"
         ```
     *   Alternatively, use Make: `make init` (note: you still need to set the backend variables manually or in your shell).
 
 4.  **Validate**:
-    *   Run `./scripts/validate.sh` to check if all required variables are set and config is valid.
+    *   Run `./scripts/validate.sh` (or `make validate`) to check if config is valid.
 
 ## SSH into the Server
 
@@ -166,7 +160,8 @@ A `Makefile` is included to provide shortcuts for common development tasks:
 
 | Command           | Description                                                        |
 | ----------------- | ------------------------------------------------------------------ |
-| `make init`       | Runs the dynamic variable initialization script.                   |
+| `make init`       | Runs the dynamic variable initialization script and terraform init.|
+| `make check-env`  | Checks if required environment variables are set.                  |
 | `make validate`   | Validates the Terraform configuration.                             |
 | `make lint`       | Runs TFLint to check for potential errors and best practices.      |
 | `make setup-ssh`  | Sets up the local SSH config using the `HCLOUD_SSH_KEY` secret.    |
