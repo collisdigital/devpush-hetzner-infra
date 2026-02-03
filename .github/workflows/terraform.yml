@@ -75,10 +75,12 @@ jobs:
           for envar in "${ENVARS[@]}"; do
             # Extract value (everything after the first =)
             source_val="${envar#*=}"
+            # Extract key (everything before the first =)
+            target_key="${envar%%=*}"
 
             # Check if source value is not empty
             if [ -n "$source_val" ]; then
-              echo "Setting $envar..."
+              echo "Setting $target_key..."
               echo "$envar" >> $GITHUB_ENV
             fi
           done
