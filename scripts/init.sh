@@ -7,84 +7,60 @@ set -e
 # It checks if specific "VAR_*" variables are set (from GitHub Actions vars or local env)
 # and exports them as standard "TF_VAR_*" variables if they are.
 
-# Check and export hcloud_server_type
-if [ -n "$VAR_SERVER_TYPE" ]; then
-    echo "Setting TF_VAR_hcloud_server_type..."
-    export TF_VAR_hcloud_server_type="$VAR_SERVER_TYPE"
-    # For GitHub Actions, we also write to GITHUB_ENV
-    if [ -n "$GITHUB_ENV" ]; then
-        echo "TF_VAR_hcloud_server_type=$VAR_SERVER_TYPE" >> $GITHUB_ENV
-    fi
-fi
+# List of optional variables to check and map
+# Format: VAR_NAME (the script expects this variable to be set)
+# It maps VAR_NAME -> TF_VAR_name (lowercase, stripped of VAR_)
+OPTIONAL_VARS=(
+  "VAR_HCLOUD_SERVER_TYPE"
+  "VAR_HCLOUD_IMAGE"
+  "VAR_HCLOUD_DEVPUSH_SERVICE_USERNAME"
+  "VAR_HCLOUD_SSH_LOGIN_USERNAME"
+  "VAR_HCLOUD_LOCATION"
+  "VAR_HCLOUD_VOLUME_SIZE_GB"
+)
 
-# Check and export hcloud_image
-if [ -n "$VAR_IMAGE" ]; then
-    echo "Setting TF_VAR_hcloud_image..."
-    export TF_VAR_hcloud_image="$VAR_IMAGE"
-    if [ -n "$GITHUB_ENV" ]; then
-        echo "TF_VAR_hcloud_image=$VAR_IMAGE" >> $GITHUB_ENV
-    fi
-fi
+for var in "${OPTIONAL_VARS[@]}"; do
+  # Indirect expansion to check if variable is set and not empty
+  if [ -n "${!var}" ]; then
+    # Construct TF_VAR name: remove VAR_ prefix and convert to lowercase
+    # e.g. VAR_HCLOUD_SERVER_TYPE -> TF_VAR_hcloud_server_type
+    suffix="${var#VAR_}"
+    tf_var_name="TF_VAR_$(echo "$suffix" | tr '[:upper:]' '[:lower:]')"
 
-# Check and export hcloud_devpush_service_username
-if [ -n "$VAR_SERVICE_USER" ]; then
-    echo "Setting TF_VAR_hcloud_devpush_service_username..."
-    export TF_VAR_hcloud_devpush_service_username="$VAR_SERVICE_USER"
-    if [ -n "$GITHUB_ENV" ]; then
-        echo "TF_VAR_hcloud_devpush_service_username=$VAR_SERVICE_USER" >> $GITHUB_ENV
-    fi
-fi
+    echo "Setting $tf_var_name..."
+    export "$tf_var_name"="${!var}"
 
-# Check and export hcloud_ssh_login_username
-if [ -n "$VAR_SSH_USER" ]; then
-    echo "Setting TF_VAR_hcloud_ssh_login_username..."
-    export TF_VAR_hcloud_ssh_login_username="$VAR_SSH_USER"
+    # For GitHub Actions, we also write to GITHUB_ENV to persist for subsequent steps
     if [ -n "$GITHUB_ENV" ]; then
-        echo "TF_VAR_hcloud_ssh_login_username=$VAR_SSH_USER" >> $GITHUB_ENV
+        echo "$tf_var_name=${!var}" >> $GITHUB_ENV
     fi
-fi
-
-# Check and export hcloud_location
-if [ -n "$VAR_LOCATION" ]; then
-    echo "Setting TF_VAR_hcloud_location..."
-    export TF_VAR_hcloud_location="$VAR_LOCATION"
-    if [ -n "$GITHUB_ENV" ]; then
-        echo "TF_VAR_hcloud_location=$VAR_LOCATION" >> $GITHUB_ENV
-    fi
-fi
-
-# Check and export hcloud_volume_size_gb
-if [ -n "$VAR_VOLUME_SIZE" ]; then
-    echo "Setting TF_VAR_hcloud_volume_size_gb..."
-    export TF_VAR_hcloud_volume_size_gb="$VAR_VOLUME_SIZE"
-    if [ -n "$GITHUB_ENV" ]; then
-        echo "TF_VAR_hcloud_volume_size_gb=$VAR_VOLUME_SIZE" >> $GITHUB_ENV
-    fi
-fi
+  fi
+done
 
 echo "Dynamic variables configured."
 
 # 2. Run Terraform Init
 echo "Running Terraform Init..."
 
-# Determine arguments based on environment variables
+# Define backend config mapping: EnvVar -> BackendConfigKey
+# Using array of "EnvVar:ConfigKey" strings
+BACKEND_MAPPINGS=(
+  "TF_BACKEND_BUCKET:bucket"
+  "TF_BACKEND_KEY:key"
+  "TF_BACKEND_REGION:region"
+  "TF_BACKEND_ENDPOINT:endpoint"
+)
+
 INIT_ARGS=""
 
-if [ -n "$TF_BACKEND_BUCKET" ]; then
-  INIT_ARGS="$INIT_ARGS -backend-config=\"bucket=${TF_BACKEND_BUCKET}\""
-fi
+for mapping in "${BACKEND_MAPPINGS[@]}"; do
+  env_var="${mapping%%:*}"
+  config_key="${mapping#*:}"
 
-if [ -n "$TF_BACKEND_KEY" ]; then
-  INIT_ARGS="$INIT_ARGS -backend-config=\"key=${TF_BACKEND_KEY}\""
-fi
-
-if [ -n "$TF_BACKEND_REGION" ]; then
-  INIT_ARGS="$INIT_ARGS -backend-config=\"region=${TF_BACKEND_REGION}\""
-fi
-
-if [ -n "$TF_BACKEND_ENDPOINT" ]; then
-  INIT_ARGS="$INIT_ARGS -backend-config=\"endpoint=${TF_BACKEND_ENDPOINT}\""
-fi
+  if [ -n "${!env_var}" ]; then
+    INIT_ARGS="$INIT_ARGS -backend-config=\"$config_key=${!env_var}\""
+  fi
+done
 
 # Construct the command
 CMD="terraform init $INIT_ARGS"

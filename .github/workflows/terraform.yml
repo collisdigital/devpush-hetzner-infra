@@ -56,12 +56,12 @@ jobs:
       - name: Configure Environment & Init
         id: init
         env:
-          VAR_SERVER_TYPE: ${{ vars.HCLOUD_SERVER_TYPE }}
-          VAR_IMAGE: ${{ vars.HCLOUD_IMAGE }}
-          VAR_SERVICE_USER: ${{ vars.HCLOUD_DEVPUSH_SERVICE_USERNAME }}
-          VAR_VOLUME_SIZE: ${{ vars.HCLOUD_VOLUME_SIZE_GB }}
-          VAR_LOCATION: ${{ vars.HCLOUD_LOCATION }}
-          VAR_SSH_USER: ${{ vars.HCLOUD_SSH_LOGIN_USERNAME }}
+          VAR_HCLOUD_SERVER_TYPE: ${{ vars.HCLOUD_SERVER_TYPE }}
+          VAR_HCLOUD_IMAGE: ${{ vars.HCLOUD_IMAGE }}
+          VAR_HCLOUD_DEVPUSH_SERVICE_USERNAME: ${{ vars.HCLOUD_DEVPUSH_SERVICE_USERNAME }}
+          VAR_HCLOUD_VOLUME_SIZE_GB: ${{ vars.HCLOUD_VOLUME_SIZE_GB }}
+          VAR_HCLOUD_LOCATION: ${{ vars.HCLOUD_LOCATION }}
+          VAR_HCLOUD_SSH_LOGIN_USERNAME: ${{ vars.HCLOUD_SSH_LOGIN_USERNAME }}
         run: |
           ./scripts/check_envars.sh
           ./scripts/init.sh
