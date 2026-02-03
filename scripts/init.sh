@@ -68,17 +68,6 @@ if [ -n "$TF_BACKEND_ENDPOINT" ]; then
   INIT_ARGS="$INIT_ARGS -backend-config=\"endpoint=${TF_BACKEND_ENDPOINT}\""
 fi
 
-# If using S3 backend with credentials provided via env vars, we might not need to pass them explicitly
-# if Terraform picks up standard AWS_* env vars, but providing them via config is safer for non-standard providers.
-# However, `backend "s3"` usually respects AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY automatically.
-# The previous workflow didn't pass access/secret key via -backend-config, it relied on env vars.
-# Wait, checking memory/previous files...
-# The previous README said: -backend-config="access_key=$AWS_ACCESS_KEY_ID"
-# But the previous workflow file (read earlier) said:
-# terraform init -backend-config="bucket=${TF_BACKEND_BUCKET}" ... (no access key)
-# It relied on `AWS_ACCESS_KEY_ID` being in the env.
-# So I will NOT add access keys to the command line arguments to avoid leaking them in logs if set -x is on (though it's off).
-
 # Construct the command
 CMD="terraform init $INIT_ARGS"
 

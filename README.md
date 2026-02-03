@@ -30,7 +30,7 @@ Before running Terraform (locally or via GitHub Actions), you must manually set 
 
 1.  **Create a Bucket**: Log in to the Hetzner Console and create an Object Storage bucket (e.g., `my-devpush-terraform-state`) in your desired region (e.g., `nbg1`).
 2.  **Get Credentials**: Create Access Key and Secret Key for this bucket.
-3.  **Notes**:
+3.  **Note Values**: **Important:** Note down the **Bucket Name**, **Region**, **Endpoint URL**, **Access Key**, and **Secret Key**. You will need these to configure the GitHub Repository secrets or your local environment in the next steps.
     *   The bucket name must be unique.
     *   The region should ideally match your server location.
     *   The endpoint URL is usually `https://<region>.your-objectstorage.com`.

@@ -74,14 +74,12 @@ jobs:
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
-        # Only run plan if secrets are available (indicated by backend bucket being set)
-        if: env.TF_BACKEND_BUCKET != ''
         run: terraform plan -no-color -input=false
         continue-on-error: true
 
       - name: Update Pull Request
         uses: actions/github-script@v8
-        if: github.event_name == 'pull_request' && env.TF_BACKEND_BUCKET != ''
+        if: github.event_name == 'pull_request'
         env:
           PLAN: ${{ steps.plan.outputs.stdout }}
         with:
