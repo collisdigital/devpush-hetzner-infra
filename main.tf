@@ -56,7 +56,7 @@ resource "hcloud_server" "devpush" {
 
 resource "hcloud_volume" "devpush_storage" {
   name     = "devpush-storage"
-  size     = var.devpush_volume_size
+  size     = var.hcloud_volume_size_gb
   location = var.hetzner_location
   format   = "ext4"
 }

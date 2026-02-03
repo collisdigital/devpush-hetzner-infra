@@ -54,11 +54,12 @@ jobs:
           tflint_version: v0.60.0
 
       - name: Configure Environment & Init
+        id: init
         env:
           VAR_SERVER_TYPE: ${{ vars.HCLOUD_SERVER_TYPE }}
           VAR_IMAGE: ${{ vars.HCLOUD_IMAGE }}
           VAR_SERVICE_USER: ${{ vars.DEVPUSH_SERVICE_USERNAME }}
-          VAR_VOLUME_SIZE: ${{ vars.DEVPUSH_VOLUME_SIZE }}
+          VAR_VOLUME_SIZE: ${{ vars.HCLOUD_VOLUME_SIZE_GB }}
         run: |
           ./scripts/check_envars.sh
           ./scripts/init.sh

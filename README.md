@@ -80,7 +80,7 @@ These can be set as **Actions Variables** (or Secrets if preferred, but Variable
 | `HCLOUD_SERVER_TYPE`       | [Server type](https://www.hetzner.com/cloud/) (e.g., `cpx11`, `cax11`). | `cax11`            | No       |
 | `HCLOUD_IMAGE`             | OS Image.                                        | `ubuntu-24.04`     | No       |
 | `DEVPUSH_SERVICE_USERNAME` | Service account username.                        | `devpush`          | No       |
-| `DEVPUSH_VOLUME_SIZE`      | Size of the persistent volume (GB).              | `10`               | No       |
+| `HCLOUD_VOLUME_SIZE_GB`    | Size of the persistent volume (GB).              | `10`               | No       |
 
 ## Codespaces
 

@@ -62,7 +62,7 @@ variable "hcloud_image" {
   default     = "ubuntu-24.04"
 }
 
-variable "devpush_volume_size" {
+variable "hcloud_volume_size_gb" {
   description = "Size of the DevPush storage volume in GB"
   type        = number
   default     = 10

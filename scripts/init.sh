@@ -35,12 +35,12 @@ if [ -n "$VAR_SERVICE_USER" ]; then
     fi
 fi
 
-# Check and export devpush_volume_size
+# Check and export hcloud_volume_size_gb
 if [ -n "$VAR_VOLUME_SIZE" ]; then
-    echo "Setting TF_VAR_devpush_volume_size..."
-    export TF_VAR_devpush_volume_size="$VAR_VOLUME_SIZE"
+    echo "Setting TF_VAR_hcloud_volume_size_gb..."
+    export TF_VAR_hcloud_volume_size_gb="$VAR_VOLUME_SIZE"
     if [ -n "$GITHUB_ENV" ]; then
-        echo "TF_VAR_devpush_volume_size=$VAR_VOLUME_SIZE" >> $GITHUB_ENV
+        echo "TF_VAR_hcloud_volume_size_gb=$VAR_VOLUME_SIZE" >> $GITHUB_ENV
     fi
 fi
 
