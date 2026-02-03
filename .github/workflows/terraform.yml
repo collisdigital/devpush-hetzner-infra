@@ -61,22 +61,22 @@ jobs:
           # the default values defined in 'variables.tf'. This logic ensures we only set the env var
           # if a value is actually provided.
 
-          # Format: SOURCE_VALUE:TARGET_TF_VAR
+          # Format: TARGET_TF_VAR:SOURCE_VALUE
           # We inject the value directly from GitHub context
           MAPPINGS=(
-            "${{ vars.HCLOUD_SERVER_TYPE }}:TF_VAR_hcloud_server_type"
-            "${{ vars.HCLOUD_IMAGE }}:TF_VAR_hcloud_image"
-            "${{ vars.HCLOUD_DEVPUSH_SERVICE_USERNAME }}:TF_VAR_hcloud_devpush_service_username"
-            "${{ vars.HCLOUD_VOLUME_SIZE_GB }}:TF_VAR_hcloud_volume_size_gb"
-            "${{ vars.HCLOUD_LOCATION }}:TF_VAR_hcloud_location"
-            "${{ vars.HCLOUD_SSH_LOGIN_USERNAME }}:TF_VAR_hcloud_ssh_login_username"
+            "TF_VAR_hcloud_server_type:${{ vars.HCLOUD_SERVER_TYPE }}"
+            "TF_VAR_hcloud_image:${{ vars.HCLOUD_IMAGE }}"
+            "TF_VAR_hcloud_devpush_service_username:${{ vars.HCLOUD_DEVPUSH_SERVICE_USERNAME }}"
+            "TF_VAR_hcloud_volume_size_gb:${{ vars.HCLOUD_VOLUME_SIZE_GB }}"
+            "TF_VAR_hcloud_location:${{ vars.HCLOUD_LOCATION }}"
+            "TF_VAR_hcloud_ssh_login_username:${{ vars.HCLOUD_SSH_LOGIN_USERNAME }}"
           )
 
           for mapping in "${MAPPINGS[@]}"; do
-            # Extract value (everything before the last colon)
-            source_val="${mapping%:*}"
-            # Extract target var name (everything after the last colon)
-            target_var="${mapping##*:}"
+            # Extract target var name (everything before the first colon)
+            target_var="${mapping%%:*}"
+            # Extract value (everything after the first colon)
+            source_val="${mapping#*:}"
 
             # Check if source value is not empty
             if [ -n "$source_val" ]; then
