@@ -53,8 +53,7 @@ jobs:
         with:
           tflint_version: v0.60.0
 
-      - name: Configure Environment & Init
-        id: init
+      - name: Configure Environment
         env:
           VAR_HCLOUD_SERVER_TYPE: ${{ vars.HCLOUD_SERVER_TYPE }}
           VAR_HCLOUD_IMAGE: ${{ vars.HCLOUD_IMAGE }}
@@ -62,6 +61,31 @@ jobs:
           VAR_HCLOUD_VOLUME_SIZE_GB: ${{ vars.HCLOUD_VOLUME_SIZE_GB }}
           VAR_HCLOUD_LOCATION: ${{ vars.HCLOUD_LOCATION }}
           VAR_HCLOUD_SSH_LOGIN_USERNAME: ${{ vars.HCLOUD_SSH_LOGIN_USERNAME }}
+        run: |
+          # Map optional variables to their Terraform counterparts
+          # Format: SOURCE_VAR:TARGET_TF_VAR
+          MAPPINGS=(
+            "VAR_HCLOUD_SERVER_TYPE:TF_VAR_hcloud_server_type"
+            "VAR_HCLOUD_IMAGE:TF_VAR_hcloud_image"
+            "VAR_HCLOUD_DEVPUSH_SERVICE_USERNAME:TF_VAR_hcloud_devpush_service_username"
+            "VAR_HCLOUD_VOLUME_SIZE_GB:TF_VAR_hcloud_volume_size_gb"
+            "VAR_HCLOUD_LOCATION:TF_VAR_hcloud_location"
+            "VAR_HCLOUD_SSH_LOGIN_USERNAME:TF_VAR_hcloud_ssh_login_username"
+          )
+
+          for mapping in "${MAPPINGS[@]}"; do
+            source_var="${mapping%%:*}"
+            target_var="${mapping#*:}"
+
+            # Check if source variable is set and not empty
+            if [ -n "${!source_var}" ]; then
+              echo "Setting $target_var..."
+              echo "$target_var=${!source_var}" >> $GITHUB_ENV
+            fi
+          done
+
+      - name: Init
+        id: init
         run: |
           ./scripts/check_envars.sh
           ./scripts/init.sh
