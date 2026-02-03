@@ -1,6 +1,9 @@
-.PHONY: all validate lint setup-ssh connect
+.PHONY: all init validate lint setup-ssh connect
 
 all: validate lint
+
+init:
+	./scripts/init.sh
 
 validate:
 	./scripts/validate.sh

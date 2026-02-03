@@ -1,0 +1,5 @@
+domain_name = "example.com"
+hcloud_server_type = "cax11"
+hcloud_image = "ubuntu-24.04"
+devpush_service_username = "devpush"
+devpush_volume_size = 10
