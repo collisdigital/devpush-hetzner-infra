@@ -8,14 +8,14 @@ packages:
 
 users:
   # SSH login user - use this account to access the server
-  - name: ${ssh_login_username}
+  - name: ${hcloud_ssh_login_username}
     groups: sudo
     shell: /bin/bash
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     ssh_authorized_keys:
       - ${ssh_public_key}
   # Devpush service account - system user with no login capability
-  - name: ${devpush_service_username}
+  - name: ${hcloud_devpush_service_username}
     system: true
     shell: /usr/sbin/nologin
     no_create_home: false
@@ -43,7 +43,7 @@ write_files:
       GITHUB_APP_CLIENT_SECRET="${devpush_github_app_client_secret}"
       
       # Email
-      EMAIL_SENDER_ADDRESS="${devpush_service_username}@${domain_name}"
+      EMAIL_SENDER_ADDRESS="${hcloud_devpush_service_username}@${domain_name}"
       RESEND_API_KEY="${devpush_resend_api_key}"
     permissions: '0600'
   - path: /usr/local/bin/merge-env.sh
@@ -91,7 +91,7 @@ runcmd:
     mkdir -p /mnt/devpush-volume/devpush/opt
     mkdir -p /mnt/devpush-volume/devpush/var-lib
     mkdir -p /mnt/devpush-volume/devpush/var-backups
-    chown -R ${devpush_service_username}:${devpush_service_username} /mnt/devpush-volume/devpush
+    chown -R ${hcloud_devpush_service_username}:${hcloud_devpush_service_username} /mnt/devpush-volume/devpush
     chmod 0750 /mnt/devpush-volume/devpush
   
   # Create parent directories and symlinks for devpush directories

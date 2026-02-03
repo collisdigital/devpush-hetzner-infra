@@ -9,7 +9,7 @@ output "server_ipv6" {
 }
 
 output "ssh_command" {
-  value       = "ssh -i <ssh_key_path> ${var.ssh_login_username}@devpush-direct.${var.domain_name}"
+  value       = "ssh -i <ssh_key_path> ${var.hcloud_ssh_login_username}@devpush-direct.${var.domain_name}"
   description = "Command to SSH into the server"
 }
 
@@ -19,6 +19,6 @@ output "devpush_url" {
 }
 
 output "hetzner_location" {
-  value       = var.hetzner_location
+  value       = var.hcloud_location
   description = "Hetzner datacenter location"
 }

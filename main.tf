@@ -29,8 +29,8 @@ resource "hcloud_server" "devpush" {
 
   user_data = templatefile("${path.module}/devpush-config.yaml", {
     ssh_public_key                    = data.hcloud_ssh_key.main.public_key
-    ssh_login_username                = var.hcloud_ssh_login_username
-    devpush_service_username          = var.hcloud_devpush_service_username
+    hcloud_ssh_login_username         = var.hcloud_ssh_login_username
+    hcloud_devpush_service_username   = var.hcloud_devpush_service_username
     domain_name                       = var.domain_name
     devpush_cloudflare_api_token      = var.devpush_cloudflare_api_token
     devpush_github_app_id             = var.devpush_github_app_id
