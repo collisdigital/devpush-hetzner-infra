@@ -13,13 +13,13 @@ env:
   TF_BACKEND_BUCKET: ${{ secrets.TF_BACKEND_BUCKET }}
   TF_BACKEND_REGION: ${{ secrets.TF_BACKEND_REGION }}
   TF_BACKEND_ENDPOINT: ${{ secrets.TF_BACKEND_ENDPOINT }}
-  TF_BACKEND_KEY: ${{ secrets.TF_BACKEND_KEY || 'devpush/terraform.tfstate' }}
+  TF_BACKEND_KEY: ${{ secrets.TF_BACKEND_KEY }}
 
   TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
+  TF_VAR_hcloud_ssh_key_name: ${{ secrets.HCLOUD_SSH_KEY_NAME }}
   TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
   TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
   TF_VAR_cloudflare_access_email: ${{ secrets.CLOUDFLARE_ACCESS_EMAIL }}
-  TF_VAR_hcloud_ssh_key_name: ${{ secrets.HCLOUD_SSH_KEY_NAME }}
   TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
   
   TF_VAR_devpush_cloudflare_api_token: ${{ secrets.DEVPUSH_CLOUDFLARE_API_TOKEN }}
@@ -58,8 +58,10 @@ jobs:
         env:
           VAR_SERVER_TYPE: ${{ vars.HCLOUD_SERVER_TYPE }}
           VAR_IMAGE: ${{ vars.HCLOUD_IMAGE }}
-          VAR_SERVICE_USER: ${{ vars.DEVPUSH_SERVICE_USERNAME }}
+          VAR_SERVICE_USER: ${{ vars.HCLOUD_DEVPUSH_SERVICE_USERNAME }}
           VAR_VOLUME_SIZE: ${{ vars.HCLOUD_VOLUME_SIZE_GB }}
+          VAR_LOCATION: ${{ vars.HCLOUD_LOCATION }}
+          VAR_SSH_USER: ${{ vars.HCLOUD_SSH_LOGIN_USERNAME }}
         run: |
           ./scripts/check_envars.sh
           ./scripts/init.sh

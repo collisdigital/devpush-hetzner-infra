@@ -3,11 +3,11 @@
 domain_name = "example.com"
 hcloud_server_type = "cax11"
 hcloud_image = "ubuntu-24.04"
-devpush_service_username = "devpush"
-devpush_volume_size = 10
+hcloud_devpush_service_username = "devpush"
+hcloud_volume_size_gb = 10
 hcloud_ssh_key_name = "my-ssh-key-name"
-hetzner_location = "nbg1"
-ssh_login_username = "admin"
+hcloud_location = "nbg1"
+hcloud_ssh_login_username = "admin"
 
 # Required Secrets (Usually set via Environment Variables)
 # ------------------------------------------------------

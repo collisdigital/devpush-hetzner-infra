@@ -3,6 +3,8 @@ set -e
 
 # Check for required environment variables
 REQUIRED_VARS=(
+  "AWS_ACCESS_KEY_ID"
+  "AWS_SECRET_ACCESS_KEY"
   "TF_VAR_hcloud_token"
   "TF_VAR_cloudflare_api_token"
   "TF_VAR_cloudflare_account_id"

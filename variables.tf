@@ -4,6 +4,11 @@ variable "hcloud_token" {
   sensitive   = true
 }
 
+variable "hcloud_ssh_key_name" {
+  description = "Name of the existing SSH key in Hetzner Cloud"
+  type        = string
+}
+
 variable "cloudflare_api_token" {
   description = "Cloudflare API Token"
   type        = string
@@ -22,29 +27,24 @@ variable "cloudflare_access_email" {
   sensitive   = true
 }
 
-variable "hcloud_ssh_key_name" {
-  description = "Name of the existing SSH key in Hetzner Cloud"
-  type        = string
-}
-
 variable "domain_name" {
   description = "Base domain name (e.g., example.com)"
   type        = string
 }
 
-variable "ssh_login_username" {
+variable "hcloud_ssh_login_username" {
   description = "Username for SSH login (separate from the devpush service account)"
   type        = string
   default     = "admin"
 }
 
-variable "devpush_service_username" {
+variable "hcloud_devpush_service_username" {
   description = "Username for the devpush service account"
   type        = string
   default     = "devpush"
 }
 
-variable "hetzner_location" {
+variable "hcloud_location" {
   description = "Hetzner datacenter location (e.g., nbg1, fsn1, hel1)"
   type        = string
   default     = "nbg1"

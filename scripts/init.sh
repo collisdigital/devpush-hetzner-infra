@@ -26,12 +26,30 @@ if [ -n "$VAR_IMAGE" ]; then
     fi
 fi
 
-# Check and export devpush_service_username
+# Check and export hcloud_devpush_service_username
 if [ -n "$VAR_SERVICE_USER" ]; then
-    echo "Setting TF_VAR_devpush_service_username..."
-    export TF_VAR_devpush_service_username="$VAR_SERVICE_USER"
+    echo "Setting TF_VAR_hcloud_devpush_service_username..."
+    export TF_VAR_hcloud_devpush_service_username="$VAR_SERVICE_USER"
     if [ -n "$GITHUB_ENV" ]; then
-        echo "TF_VAR_devpush_service_username=$VAR_SERVICE_USER" >> $GITHUB_ENV
+        echo "TF_VAR_hcloud_devpush_service_username=$VAR_SERVICE_USER" >> $GITHUB_ENV
+    fi
+fi
+
+# Check and export hcloud_ssh_login_username
+if [ -n "$VAR_SSH_USER" ]; then
+    echo "Setting TF_VAR_hcloud_ssh_login_username..."
+    export TF_VAR_hcloud_ssh_login_username="$VAR_SSH_USER"
+    if [ -n "$GITHUB_ENV" ]; then
+        echo "TF_VAR_hcloud_ssh_login_username=$VAR_SSH_USER" >> $GITHUB_ENV
+    fi
+fi
+
+# Check and export hcloud_location
+if [ -n "$VAR_LOCATION" ]; then
+    echo "Setting TF_VAR_hcloud_location..."
+    export TF_VAR_hcloud_location="$VAR_LOCATION"
+    if [ -n "$GITHUB_ENV" ]; then
+        echo "TF_VAR_hcloud_location=$VAR_LOCATION" >> $GITHUB_ENV
     fi
 fi
 

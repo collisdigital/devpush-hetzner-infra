@@ -7,7 +7,7 @@ resource "hcloud_primary_ip" "devpush_ipv4" {
   type          = "ipv4"
   assignee_type = "server"
   auto_delete   = false
-  location      = var.hetzner_location
+  location      = var.hcloud_location
 }
 
 resource "hcloud_primary_ip" "devpush_ipv6" {
@@ -15,22 +15,22 @@ resource "hcloud_primary_ip" "devpush_ipv6" {
   type          = "ipv6"
   assignee_type = "server"
   auto_delete   = false
-  location      = var.hetzner_location
+  location      = var.hcloud_location
 }
 
 resource "hcloud_server" "devpush" {
   name         = "devpush"
   image        = var.hcloud_image
   server_type  = var.hcloud_server_type
-  location     = var.hetzner_location
+  location     = var.hcloud_location
   ssh_keys     = [data.hcloud_ssh_key.main.id]
   firewall_ids = [hcloud_firewall.devpush.id]
   backups      = true
 
   user_data = templatefile("${path.module}/devpush-config.yaml", {
     ssh_public_key                    = data.hcloud_ssh_key.main.public_key
-    ssh_login_username                = var.ssh_login_username
-    devpush_service_username          = var.devpush_service_username
+    ssh_login_username                = var.hcloud_ssh_login_username
+    devpush_service_username          = var.hcloud_devpush_service_username
     domain_name                       = var.domain_name
     devpush_cloudflare_api_token      = var.devpush_cloudflare_api_token
     devpush_github_app_id             = var.devpush_github_app_id
@@ -54,15 +54,15 @@ resource "hcloud_server" "devpush" {
   }
 }
 
-resource "hcloud_volume" "devpush_storage" {
+resource "hcloud_volume" "hcloud_volume_storage" {
   name     = "devpush-storage"
   size     = var.hcloud_volume_size_gb
-  location = var.hetzner_location
+  location = var.hcloud_location
   format   = "ext4"
 }
 
 resource "hcloud_volume_attachment" "devpush_storage" {
-  volume_id = hcloud_volume.devpush_storage.id
+  volume_id = hcloud_volume.hcloud_volume_storage.id
   server_id = hcloud_server.devpush.id
   automount = false
 }

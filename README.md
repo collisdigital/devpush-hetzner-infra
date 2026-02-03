@@ -21,7 +21,7 @@ This repository contains the Terraform configuration to bootstrap a foundational
 
 1.  **[Terraform](https://developer.hashicorp.com/terraform/downloads)** (≥ 1.14.3) installed.
 2.  **[Hetzner Cloud Account](https://console.hetzner.cloud/)** with a Project and API Token.
-3.  **[Hetzner Object Storage](https://docs.hetzner.com/cloud/networks-security/object-storage/)** (for Terraform state). See **Initial Setup & Bootstrapping** below for bucket details.
+3.  **[Hetzner Object Storage](https://docs.hetzner.com/storage/object-storage)** (for Terraform state). See **Initial Setup & Bootstrapping** below for bucket details.
 4.  **[Cloudflare Account](https://dash.cloudflare.com/)** with an active zone (domain) and API Token.
 
 ## Initial Setup & Bootstrapping
@@ -46,11 +46,24 @@ Configure the following **Actions Secrets** to enable the automated workflow.
 | `TF_BACKEND_BUCKET`     | The name of your Hetzner Object Storage bucket.               |
 | `TF_BACKEND_REGION`     | The region of your bucket (e.g., `nbg1`).                     |
 | `TF_BACKEND_ENDPOINT`   | The endpoint URL (e.g., `https://nbg1.your-objectstorage.com`).|
-| `TF_BACKEND_KEY`        | (Optional) State file path. Default: `devpush/terraform.tfstate`.|
+| `TF_BACKEND_KEY`        | State file path (e.g., `devpush/terraform.tfstate`).          |
 | `AWS_ACCESS_KEY_ID`     | Access Key for the bucket.                                    |
 | `AWS_SECRET_ACCESS_KEY` | Secret Key for the bucket.                                    |
 
 ### Infrastructure & Application Secrets
+
+> **WARNING**: This setup requires **two distinct** Cloudflare API Tokens to adhere to the principle of least privilege. **Do not reuse the same token.**
+>
+> 1.  **Infrastructure Token** (`CLOUDFLARE_API_TOKEN`): Used by Terraform to manage DNS, Tunnels, and Access.
+>     *   **Permissions needed:**
+>         *   Account: `Cloudflare Tunnel:Edit`, `Zero Trust:Edit`, `Access: Organizations, Identity Providers, and Groups:Read`, `Access: Apps and Policies:Edit`
+>         *   Zone: `Zone.DNS:Edit` (restricted to the specific domain)
+>
+> 2.  **Application Token** (`DEVPUSH_CLOUDFLARE_API_TOKEN`): Used by the DevPush application (on the server) for DNS challenges.
+>     *   **Permissions needed:**
+>         *   Zone: `Zone.DNS:Edit` (restricted to the specific domain)
+>
+> Using separate tokens ensures that if the server is compromised, the attacker cannot modify your Cloudflare Account settings or Zero Trust policies.
 
 | Secret Name                      | Description                                                   |
 | -------------------------------- | ------------------------------------------------------------- |
@@ -74,13 +87,15 @@ See the [DevPush Documentation](https://github.com/hunvreus/devpush) for more de
 
 These can be set as **Actions Variables** (or Secrets if preferred, but Variables are visible).
 
-| Variable Name              | Description                                      | Default            | Required |
-| -------------------------- | ------------------------------------------------ | ------------------ | :------: |
-| `DOMAIN_NAME`              | Base domain name (e.g., `example.com`).          | **None**           | **Yes**  |
-| `HCLOUD_SERVER_TYPE`       | [Server type](https://www.hetzner.com/cloud/) (e.g., `cpx11`, `cax11`). | `cax11`            | No       |
-| `HCLOUD_IMAGE`             | OS Image.                                        | `ubuntu-24.04`     | No       |
-| `DEVPUSH_SERVICE_USERNAME` | Service account username.                        | `devpush`          | No       |
-| `HCLOUD_VOLUME_SIZE_GB`    | Size of the persistent volume (GB).              | `10`               | No       |
+| Variable Name                       | Description                                      | Default            | Required |
+| ----------------------------------- | ------------------------------------------------ | ------------------ | :------: |
+| `DOMAIN_NAME`                       | Base domain name (e.g., `example.com`).          | **None**           | **Yes**  |
+| `HCLOUD_SERVER_TYPE`                | [Server type](https://www.hetzner.com/cloud/) (e.g., `cpx11`, `cax11`). | `cax11`            | No       |
+| `HCLOUD_IMAGE`                      | OS Image.                                        | `ubuntu-24.04`     | No       |
+| `HCLOUD_DEVPUSH_SERVICE_USERNAME`   | Service account username.                        | `devpush`          | No       |
+| `HCLOUD_VOLUME_SIZE_GB`             | Size of the persistent volume (GB).              | `10`               | No       |
+| `HCLOUD_LOCATION`                   | Hetzner Location (e.g. `nbg1`).                  | `nbg1`             | No       |
+| `HCLOUD_SSH_LOGIN_USERNAME`         | SSH Username.                                    | `admin`            | No       |
 
 ## Codespaces
 
