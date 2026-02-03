@@ -3,7 +3,6 @@ set -e
 
 # This script configures dynamic environment variables and initializes Terraform.
 
-# 2. Run Terraform Init
 echo "Running Terraform Init..."
 
 # Define backend config mapping: EnvVar -> BackendConfigKey
