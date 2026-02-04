@@ -85,6 +85,12 @@ jobs:
             fi
           done
 
+          # Handle Zero Trust toggle
+          if [ "${{ vars.DISABLE_ZERO_TRUST }}" = "true" ] || [ "${{ vars.DISABLE_ZERO_TRUST }}" = "1" ]; then
+             echo "Disabling Zero Trust (DISABLE_ZERO_TRUST is set)..."
+             echo "TF_VAR_enable_zero_trust=false" >> $GITHUB_ENV
+          fi
+
       - name: Init
         id: init
         run: |

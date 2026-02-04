@@ -1,4 +1,5 @@
 resource "cloudflare_zero_trust_access_application" "devpush_access_app" {
+  count      = var.enable_zero_trust ? 1 : 0
   account_id = var.cloudflare_account_id
   name       = "DevPush Protected Ecosystem"
   type       = "self_hosted"

@@ -46,11 +46,12 @@ resource "hcloud_server" "devpush" {
     devpush_github_app_client_secret  = var.devpush_github_app_client_secret
     devpush_resend_api_key            = var.devpush_resend_api_key
     merge_env_script                  = file("${path.module}/scripts/merge_env.sh")
-    tunnel_token = base64encode(jsonencode({
+    enable_tunnel                     = var.enable_zero_trust
+    tunnel_token = var.enable_zero_trust ? base64encode(jsonencode({
       a = var.cloudflare_account_id,
-      t = cloudflare_zero_trust_tunnel_cloudflared.devpush_tunnel.id,
-      s = base64encode(random_password.tunnel_secret.result)
-    }))
+      t = cloudflare_zero_trust_tunnel_cloudflared.devpush_tunnel[0].id,
+      s = base64encode(random_password.tunnel_secret[0].result)
+    })) : ""
   })
 
   public_net {
