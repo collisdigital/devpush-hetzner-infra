@@ -32,6 +32,12 @@ variable "domain_name" {
   type        = string
 }
 
+variable "enable_zero_trust" {
+  description = "Enable Cloudflare Zero Trust (Tunnel). If false, uses standard Cloudflare Proxy and opens ports 80/443."
+  type        = bool
+  default     = true
+}
+
 variable "hcloud_ssh_login_username" {
   description = "Username for SSH login (separate from the devpush service account)"
   type        = string

@@ -18,9 +18,10 @@ Cloudflare for DNS and Zero Trust security.
 ## Architecture
 
 *   **Server**: Hetzner Cloud VPS (configurable type/image) in a configurable location (default `nbg1`).
-*   **Security**: Zero Trust architecture via Cloudflare Tunnel.
-    *   No public ingress ports (80/443 closed).
-    *   SSH access (Port 22) open for direct access (not via CF tunnel) for operational support.
+*   **Security**: Zero Trust architecture via Cloudflare Tunnel (configurable).
+    *   **Enabled (Default)**: No public ingress ports (80/443 closed). Web access is protected by Cloudflare Access policies.
+    *   **Disabled**: Public ingress ports (80/443) are open to allow standard web traffic.
+    *   SSH access (Port 22) remains open for direct access in both modes.
 *   **DNS**: Managed by Cloudflare.
     *   `devpush.example.com` → Cloudflare Tunnel (Proxied)
     *   `*.example.com` → Cloudflare Tunnel (Proxied)
@@ -222,6 +223,7 @@ These can be set as **Actions Variables** (or Secrets if preferred, but Variable
 | `HCLOUD_VOLUME_SIZE_GB`             | Size of the persistent volume (GB).              | `10`               | No       |
 | `HCLOUD_LOCATION`                   | Hetzner Location (e.g. `nbg1`).                  | `nbg1`             | No       |
 | `HCLOUD_SSH_LOGIN_USERNAME`         | SSH Username.                                    | `admin`            | No       |
+| `DISABLE_ZERO_TRUST`                | Set to `true` to disable Cloudflare Tunnel/Zero Trust. | `false`            | No       |
 
 ## Codespaces
 

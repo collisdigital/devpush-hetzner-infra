@@ -12,6 +12,34 @@ resource "hcloud_firewall" "devpush" {
     ]
   }
 
+  # HTTP (Only if Zero Trust is disabled)
+  dynamic "rule" {
+    for_each = var.enable_zero_trust ? [] : [1]
+    content {
+      direction = "in"
+      protocol  = "tcp"
+      port      = "80"
+      source_ips = [
+        "0.0.0.0/0",
+        "::/0"
+      ]
+    }
+  }
+
+  # HTTPS (Only if Zero Trust is disabled)
+  dynamic "rule" {
+    for_each = var.enable_zero_trust ? [] : [1]
+    content {
+      direction = "in"
+      protocol  = "tcp"
+      port      = "443"
+      source_ips = [
+        "0.0.0.0/0",
+        "::/0"
+      ]
+    }
+  }
+
   # Allow all outbound traffic
   rule {
     direction = "out"

@@ -131,23 +131,28 @@ runcmd:
   - echo "Checking Devpush service status..."
   - systemctl status devpush.service
 
-  # Install Cloudflare Tunnel Agent
-  - echo "Installing Cloudflared..."
+  # Install Cloudflare Tunnel Agent (Conditional)
+  - |
+    if [ "${enable_tunnel}" = "true" ]; then
+      echo "Installing Cloudflared..."
 
-  - echo "Adding Cloudflare GPG key..."
-  - sudo mkdir -p --mode=0755 /usr/share/keyrings
-  - curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+      echo "Adding Cloudflare GPG key..."
+      sudo mkdir -p --mode=0755 /usr/share/keyrings
+      curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
 
-  - echo "Adding Cloudflare repository..."
-  - echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared noble main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
-  
-  - echo "Updating package lists and installing cloudflared..."
-  - sudo apt-get update && sudo apt-get install cloudflared
-  - cloudflared --version
-  
-  - echo "Configuring Cloudflared Tunnel..."
-  - cloudflared service install --no-update-service ${tunnel_token}
+      echo "Adding Cloudflare repository..."
+      echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared noble main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
 
-  - echo "Starting Cloudflared Tunnel..."
-  - systemctl enable --now cloudflared
-  - systemctl status cloudflared
+      echo "Updating package lists and installing cloudflared..."
+      sudo apt-get update && sudo apt-get install cloudflared
+      cloudflared --version
+
+      echo "Configuring Cloudflared Tunnel..."
+      cloudflared service install --no-update-service ${tunnel_token}
+
+      echo "Starting Cloudflared Tunnel..."
+      systemctl enable --now cloudflared
+      systemctl status cloudflared
+    else
+      echo "Cloudflare Zero Trust is disabled. Skipping Cloudflared installation."
+    fi

@@ -7,9 +7,10 @@ data "cloudflare_zone" "main" {
 
 # CNAME record for devpush.${var.domain_name} pointing to Tunnel
 resource "cloudflare_dns_record" "devpush_tunnel_cname" {
+  count   = var.enable_zero_trust ? 1 : 0
   zone_id = data.cloudflare_zone.main.id
   name    = "devpush"
-  content = "${cloudflare_zero_trust_tunnel_cloudflared.devpush_tunnel.id}.cfargotunnel.com"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.devpush_tunnel[0].id}.cfargotunnel.com"
   type    = "CNAME"
   proxied = true
   ttl     = 1 # Automatic
@@ -17,13 +18,52 @@ resource "cloudflare_dns_record" "devpush_tunnel_cname" {
 
 # Wildcard CNAME *.${var.domain_name} pointing to Tunnel
 resource "cloudflare_dns_record" "wildcard" {
+  count   = var.enable_zero_trust ? 1 : 0
   zone_id = data.cloudflare_zone.main.id
   name    = "*"
-  content = "${cloudflare_zero_trust_tunnel_cloudflared.devpush_tunnel.id}.cfargotunnel.com"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.devpush_tunnel[0].id}.cfargotunnel.com"
   type    = "CNAME"
   proxied = true
   ttl     = 1 # Automatic
 }
+
+# ---------------------------------------------------------------------
+# Direct Records (When Zero Trust is Disabled)
+# ---------------------------------------------------------------------
+
+resource "cloudflare_dns_record" "devpush_app_ipv4" {
+  count   = !var.enable_zero_trust ? 1 : 0
+  zone_id = data.cloudflare_zone.main.id
+  name    = "devpush"
+  content = hcloud_primary_ip.devpush_ipv4.ip_address
+  type    = "A"
+  proxied = true
+  ttl     = 1 # Automatic
+}
+
+resource "cloudflare_dns_record" "devpush_app_ipv6" {
+  count   = !var.enable_zero_trust ? 1 : 0
+  zone_id = data.cloudflare_zone.main.id
+  name    = "devpush"
+  content = hcloud_primary_ip.devpush_ipv6.ip_address
+  type    = "AAAA"
+  proxied = true
+  ttl     = 1 # Automatic
+}
+
+resource "cloudflare_dns_record" "wildcard_direct" {
+  count   = !var.enable_zero_trust ? 1 : 0
+  zone_id = data.cloudflare_zone.main.id
+  name    = "*"
+  content = "devpush.${var.domain_name}"
+  type    = "CNAME"
+  proxied = false
+  ttl     = 1 # Automatic
+}
+
+# ---------------------------------------------------------------------
+# SSH Access (Always available)
+# ---------------------------------------------------------------------
 
 # Unproxied A record for SSH access (devpush-direct.${var.domain_name})
 resource "cloudflare_dns_record" "devpush_direct_v6" {
