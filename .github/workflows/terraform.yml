@@ -1,12 +1,17 @@
 name: "Terraform Infrastructure"
 
 on:
+  workflow_dispatch:
+
+on:
   push:
     branches:
       - main
   pull_request:
 
 env:
+  TF_LOG: "DEBUG"
+  HETZNER_API_LOG: "debug"
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   
