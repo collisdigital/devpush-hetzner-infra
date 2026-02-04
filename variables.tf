@@ -4,6 +4,11 @@ variable "hcloud_token" {
   sensitive   = true
 }
 
+variable "hcloud_ssh_key_name" {
+  description = "Name of the existing SSH key in Hetzner Cloud"
+  type        = string
+}
+
 variable "cloudflare_api_token" {
   description = "Cloudflare API Token"
   type        = string
@@ -22,30 +27,42 @@ variable "cloudflare_access_email" {
   sensitive   = true
 }
 
-variable "ssh_key_name" {
-  description = "Name of the existing SSH key in Hetzner Cloud"
-  type        = string
-}
-
 variable "domain_name" {
-  description = "Base domain name (e.g., collis.digital)"
+  description = "Base domain name (e.g., example.com)"
   type        = string
-  default     = "collis.digital"
 }
 
-variable "ssh_login_username" {
+variable "hcloud_ssh_login_username" {
   description = "Username for SSH login (separate from the devpush service account)"
   type        = string
   default     = "admin"
 }
 
-variable "hetzner_location" {
+variable "hcloud_devpush_service_username" {
+  description = "Username for the devpush service account"
+  type        = string
+  default     = "devpush"
+}
+
+variable "hcloud_location" {
   description = "Hetzner datacenter location (e.g., nbg1, fsn1, hel1)"
   type        = string
   default     = "nbg1"
 }
 
-variable "devpush_volume_size" {
+variable "hcloud_server_type" {
+  description = "Hetzner Cloud Server Type"
+  type        = string
+  default     = "cax11"
+}
+
+variable "hcloud_image" {
+  description = "Hetzner Cloud Image"
+  type        = string
+  default     = "ubuntu-24.04"
+}
+
+variable "hcloud_volume_size_gb" {
   description = "Size of the DevPush storage volume in GB"
   type        = number
   default     = 10

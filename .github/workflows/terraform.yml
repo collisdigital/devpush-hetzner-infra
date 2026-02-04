@@ -10,12 +10,17 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   
+  TF_BACKEND_BUCKET: ${{ secrets.TF_BACKEND_BUCKET }}
+  TF_BACKEND_REGION: ${{ secrets.TF_BACKEND_REGION }}
+  TF_BACKEND_ENDPOINT: ${{ secrets.TF_BACKEND_ENDPOINT }}
+  TF_BACKEND_KEY: ${{ secrets.TF_BACKEND_KEY }}
+
   TF_VAR_hcloud_token: ${{ secrets.HCLOUD_TOKEN }}
+  TF_VAR_hcloud_ssh_key_name: ${{ secrets.HCLOUD_SSH_KEY_NAME }}
   TF_VAR_cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
   TF_VAR_cloudflare_account_id: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
   TF_VAR_cloudflare_access_email: ${{ secrets.CLOUDFLARE_ACCESS_EMAIL }}
-  TF_VAR_ssh_key_name: ${{ secrets.SSH_KEY_NAME }}
-  TF_VAR_domain_name: ${{ vars.DOMAIN_NAME || 'collis.digital' }}
+  TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
   
   TF_VAR_devpush_cloudflare_api_token: ${{ secrets.DEVPUSH_CLOUDFLARE_API_TOKEN }}
   TF_VAR_devpush_github_app_id: ${{ secrets.DEVPUSH_GH_APP_ID }}
@@ -48,9 +53,43 @@ jobs:
         with:
           tflint_version: v0.60.0
 
-      - name: Terraform Init
+      - name: Configure Environment
+        run: |
+          # Map optional variables to their Terraform counterparts.
+          # We do this manually instead of using the top-level 'env' block because undefined GitHub Variables
+          # resolve to empty strings. If we passed those empty strings to Terraform, they would override
+          # the default values defined in 'variables.tf'. This logic ensures we only set the env var
+          # if a value is actually provided.
+
+          # Format: TARGET_TF_VAR=SOURCE_VALUE
+          # We inject the value directly from GitHub context
+          ENVARS=(
+            "TF_VAR_hcloud_server_type=${{ vars.HCLOUD_SERVER_TYPE }}"
+            "TF_VAR_hcloud_image=${{ vars.HCLOUD_IMAGE }}"
+            "TF_VAR_hcloud_devpush_service_username=${{ vars.HCLOUD_DEVPUSH_SERVICE_USERNAME }}"
+            "TF_VAR_hcloud_volume_size_gb=${{ vars.HCLOUD_VOLUME_SIZE_GB }}"
+            "TF_VAR_hcloud_location=${{ vars.HCLOUD_LOCATION }}"
+            "TF_VAR_hcloud_ssh_login_username=${{ vars.HCLOUD_SSH_LOGIN_USERNAME }}"
+          )
+
+          for envar in "${ENVARS[@]}"; do
+            # Extract value (everything after the first =)
+            source_val="${envar#*=}"
+            # Extract key (everything before the first =)
+            target_key="${envar%%=*}"
+
+            # Check if source value is not empty
+            if [ -n "$source_val" ]; then
+              echo "Setting $target_key..."
+              echo "$envar" >> $GITHUB_ENV
+            fi
+          done
+
+      - name: Init
         id: init
-        run: terraform init
+        run: |
+          ./scripts/check_envars.sh
+          ./scripts/init.sh
 
       - name: Run TFLint
         id: tflint

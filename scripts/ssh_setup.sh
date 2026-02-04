@@ -4,8 +4,24 @@ set -e
 # Configuration (defaults)
 KEY_FILE="$HOME/.ssh/devpush_hcloud_key"
 HOST_ALIAS="devpush"
-HOSTNAME="devpush-direct.collis.digital"
 USER="admin"
+
+# Determine Domain Name
+DOMAIN=""
+if [ -n "$1" ]; then
+    DOMAIN="$1"
+elif [ -n "$DOMAIN_NAME" ]; then
+    DOMAIN="$DOMAIN_NAME"
+elif [ -n "$TF_VAR_domain_name" ]; then
+    DOMAIN="$TF_VAR_domain_name"
+else
+    echo "Error: Domain name not provided."
+    echo "Usage: $0 <domain_name>"
+    echo "   or: export DOMAIN_NAME=<domain_name> $0"
+    exit 1
+fi
+
+HOSTNAME="devpush-direct.${DOMAIN}"
 
 # Check if the secret is available
 if [ -z "$HCLOUD_SSH_KEY" ]; then

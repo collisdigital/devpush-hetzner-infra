@@ -1,6 +1,12 @@
-.PHONY: all validate lint setup-ssh connect
+.PHONY: all init check-env validate lint setup-ssh connect
 
-all: validate lint
+all: check-env validate lint
+
+init:
+	./scripts/init.sh
+
+check-env:
+	./scripts/check_envars.sh
 
 validate:
 	./scripts/validate.sh
