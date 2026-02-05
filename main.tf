@@ -1,8 +1,3 @@
-moved {
-  from = hcloud_volume.devpush_storage
-  to   = hcloud_volume.hcloud_volume_storage
-}
-
 data "hcloud_ssh_key" "main" {
   name = var.hcloud_ssh_key_name
 }
