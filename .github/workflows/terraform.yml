@@ -2,6 +2,17 @@ name: "Terraform Infrastructure"
 
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose the Terraform action to perform'
+        required: true
+        type: choice
+        default: 'plan'
+        options:
+          - plan
+          - apply
+          - plan_and_apply
+          - validate_only
   push:
     branches:
       - main
@@ -108,7 +119,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && (inputs.action == 'plan' || inputs.action == 'plan_and_apply'))
         run: terraform plan -no-color -input=false
         continue-on-error: true
 
@@ -146,5 +157,5 @@ jobs:
         run: exit 1
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: (github.ref == 'refs/heads/main' && github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && (inputs.action == 'apply' || inputs.action == 'plan_and_apply'))
         run: terraform apply -auto-approve -input=false
