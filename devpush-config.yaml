@@ -28,7 +28,7 @@ write_files:
       PasswordAuthentication no
     permissions: '0644'
   - path: /etc/opt/devpush/.env.custom
-    content: |     
+    content: |
       APP_HOSTNAME="devpush.${domain_name}"
       DEPLOY_DOMAIN="${domain_name}"
       LE_EMAIL="admin@${domain_name}"
@@ -144,7 +144,7 @@ runcmd:
       echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared noble main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
 
       echo "Updating package lists and installing cloudflared..."
-      sudo apt-get update && sudo apt-get install cloudflared
+      sudo apt-get update && sudo apt-get install -y cloudflared
       cloudflared --version
 
       echo "Configuring Cloudflared Tunnel..."
