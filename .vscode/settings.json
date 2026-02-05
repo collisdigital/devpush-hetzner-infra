@@ -2,5 +2,15 @@
     "editor.rulers": [
         80,
         120
+    ],
+    "cSpell.words": [
+        "cloudflared",
+        "devpush",
+        "nocloud",
+        "nologin",
+        "runcmd",
+        "tfstate",
+        "tfvars",
+        "traefik"
     ]
 }

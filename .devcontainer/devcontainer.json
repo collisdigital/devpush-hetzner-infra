@@ -18,7 +18,9 @@
         "redhat.vscode-yaml",
         "github.vscode-github-actions",
         "mads-hartmann.bash-ide-vscode",
-        "EditorConfig.EditorConfig"
+        "EditorConfig.EditorConfig",
+        "ms-vscode.makefile-tools",
+        "streetsidesoftware.code-spell-checker"
       ],
       "settings": {
         "terraform.languageServer.enable": true,

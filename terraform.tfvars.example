@@ -1,25 +1,26 @@
 # Optional Configuration
 # ----------------------
 domain_name = "example.com"
+hcloud_location = "nbg1"
 hcloud_server_type = "cax11"
 hcloud_image = "ubuntu-24.04"
-hcloud_devpush_service_username = "devpush"
 hcloud_volume_size_gb = 10
-hcloud_ssh_key_name = "my-ssh-key-name"
-hcloud_location = "nbg1"
-hcloud_ssh_login_username = "admin"
 
 # Required Secrets (Usually set via Environment Variables)
 # ------------------------------------------------------
 # You can uncomment these to set them locally, but NEVER commit this file if you do!
 #
 # hcloud_token = "..."
+# hcloud_ssh_key_name = "..."
+# hcloud_ssh_login_username = "..."
+# hcloud_devpush_service_username = "..."
+#
 # cloudflare_api_token = "..."
 # cloudflare_account_id = "..."
 # cloudflare_access_email = "..."
+#
 # devpush_cloudflare_api_token = "..."
 # devpush_resend_api_key = "..."
-#
 # devpush_github_app_id = "..."
 # devpush_github_app_name = "..."
 # devpush_github_app_private_key = "..."
