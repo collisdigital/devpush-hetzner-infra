@@ -12,7 +12,7 @@ on:
           - plan
           - apply
           - plan_and_apply
-          - lint_only
+          - validate_only
   push:
     branches:
       - main
