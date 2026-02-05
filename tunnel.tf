@@ -1,18 +1,3 @@
-moved {
-  from = random_password.tunnel_secret
-  to   = random_password.tunnel_secret[0]
-}
-
-moved {
-  from = cloudflare_zero_trust_tunnel_cloudflared.devpush_tunnel
-  to   = cloudflare_zero_trust_tunnel_cloudflared.devpush_tunnel[0]
-}
-
-moved {
-  from = cloudflare_zero_trust_tunnel_cloudflared_config.devpush_config
-  to   = cloudflare_zero_trust_tunnel_cloudflared_config.devpush_config[0]
-}
-
 resource "random_password" "tunnel_secret" {
   count   = var.enable_zero_trust ? 1 : 0
   length  = 64

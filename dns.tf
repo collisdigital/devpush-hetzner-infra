@@ -9,16 +9,6 @@ data "cloudflare_zone" "main" {
 # Tunnel Records (When Zero Trust is Enabled)
 # ---------------------------------------------------------------------
 
-moved {
-  from = cloudflare_dns_record.devpush_tunnel_cname
-  to   = cloudflare_dns_record.devpush_tunnel_cname[0]
-}
-
-moved {
-  from = cloudflare_dns_record.wildcard
-  to   = cloudflare_dns_record.wildcard[0]
-}
-
 # CNAME record for devpush.${var.domain_name} pointing to Tunnel
 resource "cloudflare_dns_record" "devpush_tunnel_cname" {
   count   = var.enable_zero_trust ? 1 : 0
